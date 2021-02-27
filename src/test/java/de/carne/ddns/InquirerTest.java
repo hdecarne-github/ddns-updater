@@ -19,8 +19,8 @@ package de.carne.ddns;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
-import java.util.Objects;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,84 +29,83 @@ import de.carne.ddns.rest.IpMeInquirer;
 import de.carne.ddns.rest.IpifyInquirer;
 import de.carne.ddns.util.CombinedInquirer;
 import de.carne.util.Exceptions;
-import de.carne.util.Late;
 
 /**
  * Test {@linkplain Inquirer} implementations.
  */
 class InquirerTest {
 
-	private static final Late<Inet4Address> IPV4_ADDRESS_HOLDER = new Late<>();
-	private static final Late<Inet6Address> IPV6_ADDRESS_HOLDER = new Late<>();
+	@Nullable
+	private static Inet4Address testIPv4Address = null;
+	@Nullable
+	private static Inet6Address testIPv6Address = null;
 
 	@BeforeAll
-	static void getMyAddress() throws IOException {
+	static void getMyAddress() {
 		Inquirer inquirer = new CombinedInquirer();
 
-		IPV4_ADDRESS_HOLDER.set(Objects.requireNonNull(inquirer.queryIPv4Address()));
-		IPV6_ADDRESS_HOLDER.set(Objects.requireNonNull(inquirer.queryIPv6Address()));
+		try {
+			testIPv4Address = inquirer.queryIPv4Address();
+		} catch (IOException e) {
+			Exceptions.ignore(e);
+		}
+		try {
+			testIPv6Address = inquirer.queryIPv6Address();
+		} catch (IOException e) {
+			Exceptions.ignore(e);
+		}
 	}
 
 	@Test
-	void testCombinedInquirer() throws IOException {
+	void testCombinedInquirer() {
 		Inquirer inquirer = new CombinedInquirer();
 
-		testInquirer(inquirer, false);
+		testInquirer(inquirer);
 	}
 
 	@Test
-	void testIpMeInquirerDefault() throws IOException {
+	void testIpMeInquirerDefault() {
 		Inquirer inquirer = new IpMeInquirer();
 
-		testInquirer(inquirer, true);
+		testInquirer(inquirer);
 	}
 
 	@Test
-	void testIpMeInquirerNoSSL() throws IOException {
+	void testIpMeInquirerNoSSL() {
 		Inquirer inquirer = new IpMeInquirer(false);
 
-		testInquirer(inquirer, true);
+		testInquirer(inquirer);
 	}
 
 	@Test
-	void testIpifyInquirerDefault() throws IOException {
+	void testIpifyInquirerDefault() {
 		Inquirer inquirer = new IpifyInquirer();
 
-		testInquirer(inquirer, true);
+		testInquirer(inquirer);
 	}
 
 	@Test
-	void testIpifyInquirerNoSSL() throws IOException {
+	void testIpifyInquirerNoSSL() {
 		Inquirer inquirer = new IpifyInquirer(false);
 
-		testInquirer(inquirer, true);
+		testInquirer(inquirer);
 	}
 
-	private void testInquirer(Inquirer inquirer, boolean ignoreIOError) throws IOException {
+	private void testInquirer(Inquirer inquirer) {
 		try {
 			Inet4Address ipv4Address = inquirer.queryIPv4Address();
 
-			Assertions.assertNotNull(ipv4Address);
-			Assertions.assertEquals(IPV4_ADDRESS_HOLDER.get(), ipv4Address);
+			Assertions.assertEquals(testIPv4Address, ipv4Address);
 		} catch (IOException e) {
-			if (ignoreIOError) {
-				Exceptions.ignore(e);
-			} else {
-				throw e;
-			}
+			Exceptions.ignore(e);
 		}
 
 		try {
 			Inet6Address ipv6Address = inquirer.queryIPv6Address();
 
-			Assertions.assertNotNull(ipv6Address);
-			Assertions.assertEquals(IPV6_ADDRESS_HOLDER.get(), ipv6Address);
+			Assertions.assertEquals(testIPv6Address, ipv6Address);
 		} catch (IOException e) {
-			if (ignoreIOError) {
-				Exceptions.ignore(e);
-			} else {
-				throw e;
-			}
+			Exceptions.ignore(e);
 		}
 	}
 
