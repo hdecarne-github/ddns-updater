@@ -1,0 +1,143 @@
+// Plugins
+plugins {
+	id "de.carne.java-tools" version "0.9.1" apply false
+	id "org.sonarqube" version "3.1" apply true
+}
+
+// Build helpers
+def snapshotBuild = project.version.endsWith("-SNAPSHOT")
+def releaseBuild = !snapshotBuild
+
+def mavenReleaseRepository = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+def mavenSnapshotRepository = "https://oss.sonatype.org/content/repositories/snapshots/"
+
+def resolveProperty(propertyName, envName, defValue = "<undefined>") {
+	return ((project.findProperty(propertyName) ?: System.getenv(envName)) ?: defValue);
+}
+
+// Projects
+defaultTasks "classes", "testClasses"
+
+apply plugin: "java"
+apply plugin: "de.carne.java-tools"
+apply plugin: "jacoco"
+apply plugin: "distribution"
+apply plugin: "eclipse"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+	mavenCentral()
+	if(snapshotBuild) {
+		maven { url mavenSnapshotRepository }
+	}
+	mavenLocal()
+}
+
+dependencies {
+	implementation(group: "org.eclipse.jdt", name: "org.eclipse.jdt.annotation", version: project.annotationVersion)
+	implementation(group: "de.carne", name: "java-default", version: project.javaDefaultVersion)
+	implementation(group: "software.amazon.awssdk", name: "route53", version: rootProject.awsSdkVersion) {
+		exclude(group: "software.amazon.awssdk", module: "netty-nio-client")
+	}
+	runtime(group: "org.slf4j", name: "slf4j-api", version: project.slf4jVersion)
+	runtime(group: "org.slf4j", name: "slf4j-jdk14", version: project.slf4jVersion)
+	testImplementation(group: "de.carne", name: "java-test", version: project.javaTestVersion)
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "started", "failed", "passed", "skipped"
+		exceptionFormat "full"
+	}
+}
+
+jacoco {
+	toolVersion = project.jacocoVersion
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+		xml.destination file("${buildDir}/reports/jacoco/coverage.xml")
+		html.enabled false
+		csv.enabled false
+	}
+}
+test.finalizedBy jacocoTestReport
+
+sonarqube {
+	properties {
+		property 'sonar.coverage.jacoco.xmlReportPaths', jacocoTestReport.reports.xml.destination
+	}
+}
+
+jar {
+	manifest {
+		attributes(
+			'Created-By': "Gradle ${gradle.gradleVersion} (${System.properties['os.name']}:${System.properties['os.arch']}:${System.properties['os.version']})",
+			'Build-Jdk' : System.properties['java.version'],
+			'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").format(new Date()),
+			'X-Compile-Target-JDK': targetCompatibility,
+			'X-Compile-Source-JDK': sourceCompatibility,
+			'X-Module-Id': project.name,
+			'X-Module-Name': "FileScanner",
+			'X-Module-Version': project.version,
+			'X-Module-DocURL': projectUrl,
+			'X-Module-License': projectLicenseUrl
+		)
+	}
+}
+
+task bootJar(type: Jar) {
+	appendix = "boot"
+	entryCompression = ZipEntryCompression.STORED
+	from jar
+	from configurations.runtimeClasspath.collect {
+		it.name.matches("java-default-.*.jar") ? zipTree(it) : it
+	}
+	manifest {
+		attributes(
+			'Main-Class': "de.carne.boot.Application"
+		)
+	}
+}
+
+distributions {
+	main {
+		contents {
+			from bootJar
+		}
+	}
+}
+
+tasks.withType(Tar){
+	compression = Compression.GZIP
+	archiveExtension = "tar.gz"
+}
+
+eclipse {
+	classpath {
+		downloadSources = true
+		downloadJavadoc = true
+		file {
+			whenMerged {
+				def eeaPath = project.findProperty("eclipse.eeaPath");
+				 
+				entries.forEach {
+					if(it.path.startsWith("org.eclipse.jdt.launching.JRE_CONTAINER")) {
+						if(eeaPath != null) {
+							it.entryAttributes.put("annotationpath", eeaPath)
+						}
+					} else if(it.path.contains("/caches/modules-2/")) {
+						if(eeaPath != null) {
+							it.entryAttributes.put("annotationpath", eeaPath)
+						}
+					}
+				}
+			}
+		}
+	}
+}
