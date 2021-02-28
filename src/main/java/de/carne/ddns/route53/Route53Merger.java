@@ -112,10 +112,10 @@ public class Route53Merger implements Merger {
 
 	private void prepareChange(List<Change> changes, Map<RRType, ResourceRecordSet> currentRRSets, RRType type,
 			@Nullable InetAddress address) {
-		if (address != null) {
-			ResourceRecordSet currentRRSet = currentRRSets.get(type);
+		ResourceRecordSet currentRRSet = currentRRSets.get(type);
 
-			if (currentRRSet != null) {
+		if (currentRRSet != null) {
+			if (address != null) {
 				ResourceRecord changeRR = ResourceRecord.builder().value(address.getHostAddress()).build();
 				ResourceRecordSet changeRRSet = ResourceRecordSet.builder().type(currentRRSet.type())
 						.name(currentRRSet.name()).ttl(currentRRSet.ttl()).resourceRecords(changeRR).build();
@@ -123,10 +123,10 @@ public class Route53Merger implements Merger {
 
 				changes.add(change);
 			} else {
-				LOG.warning("Ignoring {0} record update due to missing current record", type);
+				LOG.warning("Ignoring {0} record update due to missing update", type);
 			}
-		} else {
-			LOG.info("No {0} record update");
+		} else if (address != null) {
+			LOG.warning("Ignoring {0} record update due to missing current record", type);
 		}
 	}
 
