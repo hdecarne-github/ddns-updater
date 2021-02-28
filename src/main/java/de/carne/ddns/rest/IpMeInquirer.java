@@ -30,8 +30,8 @@ import de.carne.util.Strings;
  */
 public class IpMeInquirer extends RestInquirer {
 
-	private static final URI IPV4_SSL_URI = URI.create("http://ip4only.me/api/");
-	private static final URI IPV6_SSL_URI = URI.create("http://ip6only.me/api/");
+	private static final URI IPV4_SSL_URI = URI.create("https://ip4only.me/api/");
+	private static final URI IPV6_SSL_URI = URI.create("https://ip6only.me/api/");
 
 	private static final URI IPV4_NOSSL_URI = URI.create("http://ip4only.me/api/");
 	private static final URI IPV6_NOSSL_URI = URI.create("http://ip6only.me/api/");
