@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.carne.ddns;
+package de.carne.ddns.test.rest;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
+import de.carne.ddns.Inquirer;
 import de.carne.ddns.rest.IpMeInquirer;
 import de.carne.ddns.rest.IpifyInquirer;
 import de.carne.ddns.util.CombinedInquirer;
@@ -39,7 +40,7 @@ import de.carne.util.Exceptions;
 /**
  * Test {@linkplain Inquirer} implementations.
  */
-class InquirerTest {
+class RestInquirerTest {
 
 	private static final HttpClientMockInstance HTTP_CLIENT_MOCK_INSTANCE = new HttpClientMockInstance();
 
