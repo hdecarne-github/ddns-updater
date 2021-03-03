@@ -42,7 +42,7 @@ public interface Merger {
 	 * @param address the IPv4 address to merge.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	void mergeInet4Address(@Nullable Inet4Address address) throws IOException;
+	void mergeIPv4Address(@Nullable Inet4Address address) throws IOException;
 
 	/**
 	 * Merges the IPv6 address for the host set during the initial {@linkplain #prepare(Credentials,String)} call.
@@ -50,11 +50,11 @@ public interface Merger {
 	 * @param address the IPv6 address to merge.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	void mergeInet6Address(@Nullable Inet6Address address) throws IOException;
+	void mergeIPv6Address(@Nullable Inet6Address address) throws IOException;
 
 	/**
-	 * Commits the changes batched up during any call to {@linkplain #mergeInet4Address(Inet4Address)} or
-	 * {@linkplain #mergeInet6Address(Inet6Address)}.
+	 * Commits the changes batched up during any call to {@linkplain #mergeIPv4Address(Inet4Address)} or
+	 * {@linkplain #mergeIPv6Address(Inet6Address)}.
 	 *
 	 * @param pretend whether to really apply the necessary changes or to only log them.
 	 * @throws IOException if an I/O error occurs.

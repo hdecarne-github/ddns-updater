@@ -135,8 +135,8 @@ public class DDNSUpdaterMain implements ApplicationMain {
 			Merger merger = new Route53Merger();
 
 			merger.prepare(credentials, host);
-			merger.mergeInet4Address(inet4Address);
-			merger.mergeInet6Address(inet6Address);
+			merger.mergeIPv4Address(inet4Address);
+			merger.mergeIPv6Address(inet6Address);
 			merger.commit(this.runPretend);
 			updaterStatus.updateAndFlush();
 			updated = !this.runPretend;

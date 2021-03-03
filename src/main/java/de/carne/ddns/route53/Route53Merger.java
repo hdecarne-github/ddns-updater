@@ -76,12 +76,12 @@ public class Route53Merger implements Merger {
 	}
 
 	@Override
-	public void mergeInet4Address(@Nullable Inet4Address address) throws IOException {
+	public void mergeIPv4Address(@Nullable Inet4Address address) throws IOException {
 		this.inet4Address = address;
 	}
 
 	@Override
-	public void mergeInet6Address(@Nullable Inet6Address address) throws IOException {
+	public void mergeIPv6Address(@Nullable Inet6Address address) throws IOException {
 		this.inet6Address = address;
 	}
 

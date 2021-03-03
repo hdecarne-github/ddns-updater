@@ -89,7 +89,7 @@ class RestInquirerTest {
 	}
 
 	@AfterAll
-	static void release() {
+	static void releaseMock() {
 		HTTP_CLIENT_MOCK_INSTANCE.close();
 	}
 
