@@ -20,87 +20,21 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 
 import de.carne.ddns.route53.Route53Merger;
 import de.carne.ddns.test.DummyCredentials;
-import de.carne.util.Exceptions;
-import software.amazon.awssdk.services.route53.Route53Client;
-import software.amazon.awssdk.services.route53.Route53ClientBuilder;
-import software.amazon.awssdk.services.route53.model.ChangeInfo;
-import software.amazon.awssdk.services.route53.model.ChangeResourceRecordSetsRequest;
-import software.amazon.awssdk.services.route53.model.ChangeResourceRecordSetsResponse;
-import software.amazon.awssdk.services.route53.model.ChangeStatus;
-import software.amazon.awssdk.services.route53.model.HostedZone;
-import software.amazon.awssdk.services.route53.model.ListHostedZonesResponse;
-import software.amazon.awssdk.services.route53.model.ListResourceRecordSetsRequest;
-import software.amazon.awssdk.services.route53.model.ListResourceRecordSetsResponse;
-import software.amazon.awssdk.services.route53.model.RRType;
-import software.amazon.awssdk.services.route53.model.ResourceRecord;
-import software.amazon.awssdk.services.route53.model.ResourceRecordSet;
+import de.carne.ddns.test.MergerMock;
 
 /**
  * Test {@linkplain Route53Merger} class.
  */
 class Route53MergerTest {
 
-	private static final Route53ClientBuilderMockInstance MOCK_INSTANCE = new Route53ClientBuilderMockInstance();
-
-	private static final String TEST_ZONE_ID = "1234";
-	private static final String TEST_ZONE_NAME = "domain.tld.";
-	private static final String TEST_RECORD_NAME = "test." + TEST_ZONE_NAME;
-	private static final String TEST_HOST = "test.domain.tld";
-
-	private static final Inet4Address TEST_IPV4;
-	private static final Inet6Address TEST_IPV6;
-
-	static {
-		try {
-			TEST_IPV4 = (Inet4Address) InetAddress.getByName("1.2.3.4");
-			TEST_IPV6 = (Inet6Address) InetAddress.getByName("1:2:3:4:c:d:e:f");
-		} catch (UnknownHostException e) {
-			throw Exceptions.toRuntime(e);
-		}
-	}
-
-	@BeforeAll
-	static void setupMock() throws Exception {
-		Route53Client client = Mockito.mock(Route53Client.class);
-
-		Mockito.when(client.listHostedZones())
-				.thenReturn(ListHostedZonesResponse.builder()
-						.hostedZones(HostedZone.builder().id(TEST_ZONE_ID).name(TEST_ZONE_NAME).build())
-						.isTruncated(Boolean.FALSE).build());
-
-		Mockito.when(client.listResourceRecordSets((ListResourceRecordSetsRequest) ArgumentMatchers.any()))
-				.thenReturn(
-						ListResourceRecordSetsResponse.builder()
-								.resourceRecordSets(
-										ResourceRecordSet.builder().type(RRType.A).name(TEST_RECORD_NAME)
-												.resourceRecords(ResourceRecord.builder()
-														.value(TEST_IPV4.getHostAddress()).build())
-												.build(),
-										ResourceRecordSet.builder().type(RRType.AAAA).name(TEST_RECORD_NAME)
-												.resourceRecords(ResourceRecord.builder()
-														.value(TEST_IPV6.getHostAddress()).build())
-												.build())
-								.isTruncated(Boolean.FALSE).build());
-
-		Mockito.when(client.changeResourceRecordSets((ChangeResourceRecordSetsRequest) ArgumentMatchers.any()))
-				.thenReturn(ChangeResourceRecordSetsResponse.builder()
-						.changeInfo(ChangeInfo.builder().id(TEST_ZONE_ID).status(ChangeStatus.PENDING).build())
-						.build());
-
-		Route53ClientBuilder builder = MOCK_INSTANCE.get();
-
-		Mockito.doReturn(client).when(builder).build();
-	}
+	private static final Route53ClientMockInstance MOCK_INSTANCE = new Route53ClientMockInstance();
 
 	@AfterAll
 	static void releaseMock() throws Exception {
@@ -108,21 +42,83 @@ class Route53MergerTest {
 	}
 
 	@Test
-	void testUpdateChange() throws IOException {
+	void testUpdatePretend() throws IOException {
+		MOCK_INSTANCE.setARecord(MergerMock.TEST_A_RECORD_OLD);
+		MOCK_INSTANCE.setAAAARecord(MergerMock.TEST_AAAA_RECORD_OLD);
+
 		Route53Merger merger = new Route53Merger();
 
-		merger.prepare(new DummyCredentials(), TEST_HOST);
-		merger.mergeIPv4Address(TEST_IPV4);
-		merger.mergeIPv6Address(TEST_IPV6);
-		merger.commit(false);
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.mergeIPv4Address((Inet4Address) InetAddress.getByName(MergerMock.TEST_A_RECORD_NEW));
+		merger.mergeIPv6Address((Inet6Address) InetAddress.getByName(MergerMock.TEST_AAAA_RECORD_NEW));
+		merger.commit(true);
 
-		Route53Client client = getClientMock();
-
-		Mockito.verify(client).changeResourceRecordSets((ChangeResourceRecordSetsRequest) ArgumentMatchers.any());
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_OLD, MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_OLD, MOCK_INSTANCE.getAAAARecord());
 	}
 
-	private Route53Client getClientMock() {
-		return MOCK_INSTANCE.get().build();
+	@Test
+	void testUpdateChange() throws IOException {
+		MOCK_INSTANCE.setARecord(MergerMock.TEST_A_RECORD_OLD);
+		MOCK_INSTANCE.setAAAARecord(MergerMock.TEST_AAAA_RECORD_OLD);
+
+		Route53Merger merger = new Route53Merger();
+
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.mergeIPv4Address((Inet4Address) InetAddress.getByName(MergerMock.TEST_A_RECORD_NEW));
+		merger.mergeIPv6Address((Inet6Address) InetAddress.getByName(MergerMock.TEST_AAAA_RECORD_NEW));
+		merger.commit(false);
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_NEW, MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdateChangeNoIPv4() throws IOException {
+		MOCK_INSTANCE.setARecord(null);
+		MOCK_INSTANCE.setAAAARecord(MergerMock.TEST_AAAA_RECORD_OLD);
+
+		Route53Merger merger = new Route53Merger();
+
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.mergeIPv4Address((Inet4Address) InetAddress.getByName(MergerMock.TEST_A_RECORD_NEW));
+		merger.mergeIPv6Address((Inet6Address) InetAddress.getByName(MergerMock.TEST_AAAA_RECORD_NEW));
+		merger.commit(false);
+
+		Assertions.assertNull(MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_NEW, MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdateChangeNoIPv6() throws IOException {
+		MOCK_INSTANCE.setARecord(MergerMock.TEST_A_RECORD_OLD);
+		MOCK_INSTANCE.setAAAARecord(null);
+
+		Route53Merger merger = new Route53Merger();
+
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.mergeIPv4Address((Inet4Address) InetAddress.getByName(MergerMock.TEST_A_RECORD_NEW));
+		merger.mergeIPv6Address((Inet6Address) InetAddress.getByName(MergerMock.TEST_AAAA_RECORD_NEW));
+		merger.commit(false);
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MOCK_INSTANCE.getARecord());
+		Assertions.assertNull(MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdateChangeNoRecords() throws IOException {
+		MOCK_INSTANCE.setARecord(null);
+		MOCK_INSTANCE.setAAAARecord(null);
+
+		Route53Merger merger = new Route53Merger();
+
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.mergeIPv4Address((Inet4Address) InetAddress.getByName(MergerMock.TEST_A_RECORD_NEW));
+		merger.mergeIPv6Address((Inet6Address) InetAddress.getByName(MergerMock.TEST_AAAA_RECORD_NEW));
+		merger.commit(false);
+
+		Assertions.assertNull(MOCK_INSTANCE.getARecord());
+		Assertions.assertNull(MOCK_INSTANCE.getAAAARecord());
 	}
 
 }
