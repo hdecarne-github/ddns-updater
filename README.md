@@ -28,13 +28,16 @@ ddns-updater-boot-<version> [--verbose|--debug] [--quiet] [--credentials file] [
 --quiet
 	Only emit messages in case of warnings or failure
 --credentials file
-	Use <file> to read credentials (see below). If not specificed the file ~/.de.carne.ddns/credentials.conf is assumed.
+	Use <file> to read credentials (see below).
+	Defaults to ~/.de.carne.ddns/credentials.conf.
 --noipv4
 	Do not detect and update IPv4 address.
 --noipv6
 	Do not detect and update IPv6 address.
 --force
 	Forces an update (even if the zone is considered up-to-date).
+--pretend
+	Run but do not apply any DNS changes.
 --host host
 	The host name to update.
 ```
