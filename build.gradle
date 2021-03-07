@@ -18,6 +18,7 @@ def resolveProperty(propertyName, envName, defValue = "<undefined>") {
 javatools {
 	githubRelease {
 		enabled = true
+		releaseNotes = file("./RELEASE.md")
 		releaseAssets = fileTree("build/distributions") {
 			include("*")
 		}
