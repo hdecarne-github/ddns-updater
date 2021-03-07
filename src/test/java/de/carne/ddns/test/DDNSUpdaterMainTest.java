@@ -17,9 +17,11 @@
 package de.carne.ddns.test;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import de.carne.ddns.DDNSUpdaterMain;
+import de.carne.ddns.test.rest.RestHttpClientMockInstance;
 import de.carne.ddns.test.route53.Route53ClientMockInstance;
 
 /**
@@ -28,10 +30,12 @@ import de.carne.ddns.test.route53.Route53ClientMockInstance;
 class DDNSUpdaterMainTest {
 
 	private static final Route53ClientMockInstance MERGER_MOCK_INSTANCE = new Route53ClientMockInstance();
+	private static final RestHttpClientMockInstance REST_HTTP_CLIENT_MOCK_INSTANCE = new RestHttpClientMockInstance();
 
 	@AfterAll
 	static void releaseMock() throws Exception {
 		MERGER_MOCK_INSTANCE.close();
+		REST_HTTP_CLIENT_MOCK_INSTANCE.close();
 	}
 
 	@Test
@@ -40,6 +44,20 @@ class DDNSUpdaterMainTest {
 
 		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
 				MergerMock.TEST_HOST });
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MERGER_MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_NEW, MERGER_MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdatePretend() {
+		DDNSUpdaterMain main = new DDNSUpdaterMain();
+
+		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
+				MergerMock.TEST_HOST, "--pretend" });
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MERGER_MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_NEW, MERGER_MOCK_INSTANCE.getAAAARecord());
 	}
 
 }

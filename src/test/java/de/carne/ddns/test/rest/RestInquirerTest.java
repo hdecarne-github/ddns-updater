@@ -19,22 +19,15 @@ package de.carne.ddns.test.rest;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 
 import de.carne.ddns.Inquirer;
 import de.carne.ddns.rest.IpMeInquirer;
 import de.carne.ddns.rest.IpifyInquirer;
 import de.carne.ddns.util.CombinedInquirer;
-import de.carne.test.mock.net.http.HttpClientMockInstance;
 import de.carne.util.Exceptions;
 
 /**
@@ -42,55 +35,11 @@ import de.carne.util.Exceptions;
  */
 class RestInquirerTest {
 
-	private static final HttpClientMockInstance HTTP_CLIENT_MOCK_INSTANCE = new HttpClientMockInstance();
-
-	private static final String TEST_IPV4 = "1.2.3.4";
-	private static final String TEST_IPV6 = "1:2:3:4:c:d:e:f";
-
-	private static final Pattern IPME_IPV4_URI_PATTERN = Pattern.compile("^https?\\://ip4only\\.me/api/");
-	private static final Pattern IPME_IPV6_URI_PATTERN = Pattern.compile("^https?\\://ip6only\\.me/api/");
-
-	private static final String IPME_IPV4_RESPONSE = "IPv4,1.2.3.4,Remaining fields reserved for future use,,,";
-	private static final String IPME_IPV6_RESPONSE = "IPv6,1:2:3:4:c:d:e:f,Remaining fields reserved for future use,,,";
-
-	private static final Pattern IPIFY_IPV4_URI_PATTERN = Pattern.compile("^https?://api\\.ipify\\.org");
-	private static final Pattern IPIFY_IPV6_URI_PATTERN = Pattern.compile("^https?://api6\\.ipify\\.org");
-
-	private static final String IPIFY_IPV4_RESPONSE = TEST_IPV4;
-	private static final String IPIFY_IPV6_RESPONSE = TEST_IPV6;
-
-	@BeforeAll
-	static void setupMock() throws IOException, InterruptedException {
-		HttpClient httpClient = HTTP_CLIENT_MOCK_INSTANCE.get();
-
-		@SuppressWarnings("unchecked") HttpResponse<String> ipmeIPv4Response = Mockito.mock(HttpResponse.class);
-
-		Mockito.when(ipmeIPv4Response.body()).thenReturn(IPME_IPV4_RESPONSE);
-		Mockito.doReturn(ipmeIPv4Response).when(httpClient)
-				.send(HttpClientMockInstance.requestUriMatches(IPME_IPV4_URI_PATTERN), ArgumentMatchers.any());
-
-		@SuppressWarnings("unchecked") HttpResponse<String> ipmeIPv6Response = Mockito.mock(HttpResponse.class);
-
-		Mockito.when(ipmeIPv6Response.body()).thenReturn(IPME_IPV6_RESPONSE);
-		Mockito.doReturn(ipmeIPv6Response).when(httpClient)
-				.send(HttpClientMockInstance.requestUriMatches(IPME_IPV6_URI_PATTERN), ArgumentMatchers.any());
-
-		@SuppressWarnings("unchecked") HttpResponse<String> ipifyIPv4Response = Mockito.mock(HttpResponse.class);
-
-		Mockito.when(ipifyIPv4Response.body()).thenReturn(IPIFY_IPV4_RESPONSE);
-		Mockito.doReturn(ipifyIPv4Response).when(httpClient)
-				.send(HttpClientMockInstance.requestUriMatches(IPIFY_IPV4_URI_PATTERN), ArgumentMatchers.any());
-
-		@SuppressWarnings("unchecked") HttpResponse<String> ipifyIPv6Response = Mockito.mock(HttpResponse.class);
-
-		Mockito.when(ipifyIPv6Response.body()).thenReturn(IPIFY_IPV6_RESPONSE);
-		Mockito.doReturn(ipifyIPv6Response).when(httpClient)
-				.send(HttpClientMockInstance.requestUriMatches(IPIFY_IPV6_URI_PATTERN), ArgumentMatchers.any());
-	}
+	private static final RestHttpClientMockInstance REST_HTTP_CLIENT_MOCK_INSTANCE = new RestHttpClientMockInstance();
 
 	@AfterAll
 	static void releaseMock() {
-		HTTP_CLIENT_MOCK_INSTANCE.close();
+		REST_HTTP_CLIENT_MOCK_INSTANCE.close();
 	}
 
 	@Test
@@ -133,7 +82,7 @@ class RestInquirerTest {
 			Inet4Address ipv4Address = inquirer.queryIPv4Address();
 
 			Assertions.assertNotNull(ipv4Address);
-			Assertions.assertEquals(TEST_IPV4, ipv4Address.getHostAddress());
+			Assertions.assertEquals(RestHttpClientMockInstance.TEST_IPV4, ipv4Address.getHostAddress());
 		} catch (IOException e) {
 			Exceptions.ignore(e);
 		}
@@ -142,7 +91,7 @@ class RestInquirerTest {
 			Inet6Address ipv6Address = inquirer.queryIPv6Address();
 
 			Assertions.assertNotNull(ipv6Address);
-			Assertions.assertEquals(TEST_IPV6, ipv6Address.getHostAddress());
+			Assertions.assertEquals(RestHttpClientMockInstance.TEST_IPV6, ipv6Address.getHostAddress());
 		} catch (IOException e) {
 			Exceptions.ignore(e);
 		}
