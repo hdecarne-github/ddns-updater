@@ -121,4 +121,18 @@ class Route53MergerTest {
 		Assertions.assertNull(MOCK_INSTANCE.getAAAARecord());
 	}
 
+	@Test
+	void testUpdateChangeNoUpdated() throws IOException {
+		MOCK_INSTANCE.setARecord(MergerMock.TEST_A_RECORD_OLD);
+		MOCK_INSTANCE.setAAAARecord(MergerMock.TEST_AAAA_RECORD_OLD);
+
+		Route53Merger merger = new Route53Merger();
+
+		merger.prepare(new DummyCredentials(), MergerMock.TEST_HOST);
+		merger.commit(false);
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_OLD, MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_OLD, MOCK_INSTANCE.getAAAARecord());
+	}
+
 }

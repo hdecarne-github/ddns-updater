@@ -40,6 +40,8 @@ class DDNSUpdaterMainTest {
 
 	@Test
 	void testUpdateChange() {
+		resetMergerMock();
+
 		DDNSUpdaterMain main = new DDNSUpdaterMain();
 
 		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
@@ -51,13 +53,46 @@ class DDNSUpdaterMainTest {
 
 	@Test
 	void testUpdatePretend() {
+		resetMergerMock();
+
 		DDNSUpdaterMain main = new DDNSUpdaterMain();
 
 		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
 				MergerMock.TEST_HOST, "--pretend" });
 
-		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MERGER_MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_OLD, MERGER_MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_OLD, MERGER_MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdateChangeNoIPv4() {
+		resetMergerMock();
+
+		DDNSUpdaterMain main = new DDNSUpdaterMain();
+
+		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
+				MergerMock.TEST_HOST, "--noipv4" });
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_OLD, MERGER_MOCK_INSTANCE.getARecord());
 		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_NEW, MERGER_MOCK_INSTANCE.getAAAARecord());
+	}
+
+	@Test
+	void testUpdateChangeNoIPv6() {
+		resetMergerMock();
+
+		DDNSUpdaterMain main = new DDNSUpdaterMain();
+
+		main.run(new String[] { "--credentials", "./src/test/resources/credentials.conf", "--host",
+				MergerMock.TEST_HOST, "--noipv6" });
+
+		Assertions.assertEquals(MergerMock.TEST_A_RECORD_NEW, MERGER_MOCK_INSTANCE.getARecord());
+		Assertions.assertEquals(MergerMock.TEST_AAAA_RECORD_OLD, MERGER_MOCK_INSTANCE.getAAAARecord());
+	}
+
+	private void resetMergerMock() {
+		MERGER_MOCK_INSTANCE.setARecord(MergerMock.TEST_A_RECORD_OLD);
+		MERGER_MOCK_INSTANCE.setAAAARecord(MergerMock.TEST_AAAA_RECORD_OLD);
 	}
 
 }
