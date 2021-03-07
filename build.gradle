@@ -1,7 +1,7 @@
 // Plugins
 plugins {
-	id "de.carne.java-tools" version "0.9.1" apply false
-	id "org.sonarqube" version "3.1" apply true
+	id "de.carne.java-tools" version "0.9.1"
+	id "org.sonarqube" version "3.1"
 }
 
 // Build helpers
@@ -13,6 +13,18 @@ def mavenSnapshotRepository = "https://oss.sonatype.org/content/repositories/sna
 
 def resolveProperty(propertyName, envName, defValue = "<undefined>") {
 	return ((project.findProperty(propertyName) ?: System.getenv(envName)) ?: defValue);
+}
+
+javatools {
+	githubRelease {
+		enabled = true
+		releaseAssets = fileTree("build/distributions") {
+			include("*")
+		}
+		overwrite = true
+		githubToken = project.findProperty('githubToken')
+		ignoreDirty = true
+	}
 }
 
 // Projects
@@ -114,6 +126,7 @@ distributions {
 		}
 	}
 }
+draftGitHubRelease.dependsOn(assembleDist)
 
 tasks.withType(Tar){
 	compression = Compression.GZIP
