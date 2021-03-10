@@ -92,8 +92,9 @@ abstract class RestInquirer implements Inquirer {
 		return decodeResponse(response);
 	}
 
+	@SuppressWarnings({ "unused", "java:S1130" })
 	protected String decodeResponse(String response) throws IOException {
-		throw new IOException("No decoder for response: '" + response + "'");
+		return response;
 	}
 
 	private String queryUri(URI uri) throws IOException {

@@ -16,7 +16,6 @@
  */
 package de.carne.ddns.rest;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,7 +33,8 @@ public class Ipv6testInquirer extends RestInquirer {
 	private static final URI IPV4_NOSSL_URI = URI.create("http://v4.ipv6-test.com/api/myip.php");
 	private static final URI IPV6_NOSSL_URI = URI.create("http://v4.ipv6-test.com/api/myip.php");
 
-	private final boolean ssl;
+	private final URI ipv4Uri;
+	private final URI ipv6Uri;
 
 	/**
 	 * Constructs a new {@linkplain Ipv6testInquirer} instance.
@@ -49,24 +49,20 @@ public class Ipv6testInquirer extends RestInquirer {
 	 * @param ssl whether to use ssl based access or not.
 	 */
 	public Ipv6testInquirer(boolean ssl) {
-		this.ssl = ssl;
+		this.ipv4Uri = (ssl ? IPV4_SSL_URI : IPV4_NOSSL_URI);
+		this.ipv6Uri = (ssl ? IPV6_SSL_URI : IPV6_NOSSL_URI);
 	}
 
 	@Override
 	@Nullable
 	protected URI getIPv4Uri() {
-		return (this.ssl ? IPV4_SSL_URI : IPV4_NOSSL_URI);
+		return this.ipv4Uri;
 	}
 
 	@Override
 	@Nullable
 	protected URI getIPv6Uri() {
-		return (this.ssl ? IPV6_SSL_URI : IPV6_NOSSL_URI);
-	}
-
-	@Override
-	protected String decodeResponse(String response) throws IOException {
-		return response;
+		return this.ipv6Uri;
 	}
 
 }
