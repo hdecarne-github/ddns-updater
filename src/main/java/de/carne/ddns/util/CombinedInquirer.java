@@ -25,6 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import de.carne.ddns.Inquirer;
 import de.carne.ddns.rest.IpMeInquirer;
 import de.carne.ddns.rest.IpifyInquirer;
+import de.carne.ddns.rest.Ipv6testInquirer;
 import de.carne.util.logging.Log;
 
 /**
@@ -40,7 +41,8 @@ public class CombinedInquirer implements Inquirer {
 	 * Constructs a new {@linkplain CombinedInquirer} instance.
 	 */
 	public CombinedInquirer() {
-		this(new IpifyInquirer(true), new IpMeInquirer(true), new IpifyInquirer(false), new IpMeInquirer(false));
+		this(new Ipv6testInquirer(true), new IpifyInquirer(true), new IpMeInquirer(true), new Ipv6testInquirer(false),
+				new IpifyInquirer(false), new IpMeInquirer(false));
 	}
 
 	/**

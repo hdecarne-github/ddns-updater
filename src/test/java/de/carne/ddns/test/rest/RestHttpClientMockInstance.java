@@ -44,6 +44,14 @@ public class RestHttpClientMockInstance extends HttpClientMockInstance {
 	 */
 	public static final String TEST_IPV6 = MergerMock.TEST_AAAA_RECORD_NEW;
 
+	private static final Pattern IPV6TEST_IPV4_URI_PATTERN = Pattern
+			.compile("^https?://v4\\.ipv6-test\\.com/api/myip.php");
+	private static final Pattern IPV6TEST_IPV6_URI_PATTERN = Pattern
+			.compile("^https?://v6\\.ipv6-test\\.com/api/myip.php");
+
+	private static final String IPV6TEST_IPV4_RESPONSE = TEST_IPV4;
+	private static final String IPV6TEST_IPV6_RESPONSE = TEST_IPV6;
+
 	private static final Pattern IPME_IPV4_URI_PATTERN = Pattern.compile("^https?\\://ip4only\\.me/api/");
 	private static final Pattern IPME_IPV6_URI_PATTERN = Pattern.compile("^https?\\://ip6only\\.me/api/");
 
@@ -68,6 +76,18 @@ public class RestHttpClientMockInstance extends HttpClientMockInstance {
 	private void setupMock() {
 		try {
 			HttpClient httpClient = get();
+
+			@SuppressWarnings("unchecked") HttpResponse<String> ipv6testIPv4Response = Mockito.mock(HttpResponse.class);
+
+			Mockito.when(ipv6testIPv4Response.body()).thenReturn(IPV6TEST_IPV4_RESPONSE);
+			Mockito.doReturn(ipv6testIPv4Response).when(httpClient)
+					.send(HttpClientMockInstance.requestUriMatches(IPV6TEST_IPV4_URI_PATTERN), ArgumentMatchers.any());
+
+			@SuppressWarnings("unchecked") HttpResponse<String> ipv6testIPv6Response = Mockito.mock(HttpResponse.class);
+
+			Mockito.when(ipv6testIPv6Response.body()).thenReturn(IPV6TEST_IPV6_RESPONSE);
+			Mockito.doReturn(ipv6testIPv6Response).when(httpClient)
+					.send(HttpClientMockInstance.requestUriMatches(IPV6TEST_IPV6_URI_PATTERN), ArgumentMatchers.any());
 
 			@SuppressWarnings("unchecked") HttpResponse<String> ipmeIPv4Response = Mockito.mock(HttpResponse.class);
 

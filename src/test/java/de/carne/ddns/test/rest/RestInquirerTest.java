@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import de.carne.ddns.Inquirer;
 import de.carne.ddns.rest.IpMeInquirer;
 import de.carne.ddns.rest.IpifyInquirer;
+import de.carne.ddns.rest.Ipv6testInquirer;
 import de.carne.ddns.util.CombinedInquirer;
 import de.carne.util.Exceptions;
 
@@ -45,6 +46,20 @@ class RestInquirerTest {
 	@Test
 	void testCombinedInquirer() {
 		Inquirer inquirer = new CombinedInquirer();
+
+		testInquirer(inquirer);
+	}
+
+	@Test
+	void testIpv6testInquirerDefault() {
+		Inquirer inquirer = new Ipv6testInquirer();
+
+		testInquirer(inquirer);
+	}
+
+	@Test
+	void testIpv6testInquirerNoSSL() {
+		Inquirer inquirer = new Ipv6testInquirer(false);
 
 		testInquirer(inquirer);
 	}
