@@ -27,42 +27,19 @@ import de.carne.ddns.Inquirer;
  */
 public class IpifyInquirer extends RestInquirer {
 
-	private static final URI IPV4_SSL_URI = URI.create("https://api.ipify.org");
-	private static final URI IPV6_SSL_URI = URI.create("https://api6.ipify.org");
-
-	private static final URI IPV4_NOSSL_URI = URI.create("http://api.ipify.org");
-	private static final URI IPV6_NOSSL_URI = URI.create("http://api6.ipify.org");
-
-	private final URI ipv4Uri;
-	private final URI ipv6Uri;
-
-	/**
-	 * Constructs a new {@linkplain IpifyInquirer} instance.
-	 */
-	public IpifyInquirer() {
-		this(true);
-	}
-
-	/**
-	 * Constructs a new {@linkplain IpifyInquirer} instance.
-	 *
-	 * @param ssl whether to use ssl based access or not.
-	 */
-	public IpifyInquirer(boolean ssl) {
-		this.ipv4Uri = (ssl ? IPV4_SSL_URI : IPV4_NOSSL_URI);
-		this.ipv6Uri = (ssl ? IPV6_SSL_URI : IPV6_NOSSL_URI);
-	}
+	private static final URI IPV4_URI = URI.create("https://api.ipify.org");
+	private static final URI IPV6_URI = URI.create("https://api6.ipify.org");
 
 	@Override
 	@Nullable
 	protected URI getIPv4Uri() {
-		return this.ipv4Uri;
+		return IPV4_URI;
 	}
 
 	@Override
 	@Nullable
 	protected URI getIPv6Uri() {
-		return this.ipv6Uri;
+		return IPV6_URI;
 	}
 
 }

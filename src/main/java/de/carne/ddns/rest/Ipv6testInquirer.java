@@ -27,42 +27,19 @@ import de.carne.ddns.Inquirer;
  */
 public class Ipv6testInquirer extends RestInquirer {
 
-	private static final URI IPV4_SSL_URI = URI.create("https://v4.ipv6-test.com/api/myip.php");
-	private static final URI IPV6_SSL_URI = URI.create("https://v6.ipv6-test.com/api/myip.php");
-
-	private static final URI IPV4_NOSSL_URI = URI.create("http://v4.ipv6-test.com/api/myip.php");
-	private static final URI IPV6_NOSSL_URI = URI.create("http://v4.ipv6-test.com/api/myip.php");
-
-	private final URI ipv4Uri;
-	private final URI ipv6Uri;
-
-	/**
-	 * Constructs a new {@linkplain Ipv6testInquirer} instance.
-	 */
-	public Ipv6testInquirer() {
-		this(true);
-	}
-
-	/**
-	 * Constructs a new {@linkplain Ipv6testInquirer} instance.
-	 *
-	 * @param ssl whether to use ssl based access or not.
-	 */
-	public Ipv6testInquirer(boolean ssl) {
-		this.ipv4Uri = (ssl ? IPV4_SSL_URI : IPV4_NOSSL_URI);
-		this.ipv6Uri = (ssl ? IPV6_SSL_URI : IPV6_NOSSL_URI);
-	}
+	private static final URI IPV4_URI = URI.create("https://v4.ipv6-test.com/api/myip.php");
+	private static final URI IPV6_URI = URI.create("https://v6.ipv6-test.com/api/myip.php");
 
 	@Override
 	@Nullable
 	protected URI getIPv4Uri() {
-		return this.ipv4Uri;
+		return IPV4_URI;
 	}
 
 	@Override
 	@Nullable
 	protected URI getIPv6Uri() {
-		return this.ipv6Uri;
+		return IPV6_URI;
 	}
 
 }

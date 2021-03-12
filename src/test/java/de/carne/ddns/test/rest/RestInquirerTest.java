@@ -58,13 +58,6 @@ class RestInquirerTest {
 	}
 
 	@Test
-	void testIpv6testInquirerNoSSL() {
-		Inquirer inquirer = new Ipv6testInquirer(false);
-
-		testInquirer(inquirer);
-	}
-
-	@Test
 	void testIpMeInquirerDefault() {
 		Inquirer inquirer = new IpMeInquirer();
 
@@ -72,22 +65,8 @@ class RestInquirerTest {
 	}
 
 	@Test
-	void testIpMeInquirerNoSSL() {
-		Inquirer inquirer = new IpMeInquirer(false);
-
-		testInquirer(inquirer);
-	}
-
-	@Test
 	void testIpifyInquirerDefault() {
 		Inquirer inquirer = new IpifyInquirer();
-
-		testInquirer(inquirer);
-	}
-
-	@Test
-	void testIpifyInquirerNoSSL() {
-		Inquirer inquirer = new IpifyInquirer(false);
 
 		testInquirer(inquirer);
 	}

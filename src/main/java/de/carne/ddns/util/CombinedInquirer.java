@@ -41,8 +41,7 @@ public class CombinedInquirer implements Inquirer {
 	 * Constructs a new {@linkplain CombinedInquirer} instance.
 	 */
 	public CombinedInquirer() {
-		this(new Ipv6testInquirer(true), new IpifyInquirer(true), new IpMeInquirer(true), new Ipv6testInquirer(false),
-				new IpifyInquirer(false), new IpMeInquirer(false));
+		this(new Ipv6testInquirer(), new IpifyInquirer(), new IpMeInquirer());
 	}
 
 	/**

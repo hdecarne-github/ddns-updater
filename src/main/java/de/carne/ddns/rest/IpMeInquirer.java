@@ -30,45 +30,22 @@ import de.carne.util.Strings;
  */
 public class IpMeInquirer extends RestInquirer {
 
-	private static final URI IPV4_SSL_URI = URI.create("https://ip4only.me/api/");
-	private static final URI IPV6_SSL_URI = URI.create("https://ip6only.me/api/");
-
-	private static final URI IPV4_NOSSL_URI = URI.create("http://ip4only.me/api/");
-	private static final URI IPV6_NOSSL_URI = URI.create("http://ip6only.me/api/");
+	private static final URI IPV4_URI = URI.create("https://ip4only.me/api/");
+	private static final URI IPV6_URI = URI.create("https://ip6only.me/api/");
 
 	private static final String TYPE_IPV4 = "IPv4";
 	private static final String TYPE_IPV6 = "IPv6";
 
-	private final URI ipv4Uri;
-	private final URI ipv6Uri;
-
-	/**
-	 * Constructs a new {@linkplain IpMeInquirer} instance.
-	 */
-	public IpMeInquirer() {
-		this(true);
-	}
-
-	/**
-	 * Constructs a new {@linkplain IpMeInquirer} instance.
-	 *
-	 * @param ssl whether to use ssl based access or not.
-	 */
-	public IpMeInquirer(boolean ssl) {
-		this.ipv4Uri = (ssl ? IPV4_SSL_URI : IPV4_NOSSL_URI);
-		this.ipv6Uri = (ssl ? IPV6_SSL_URI : IPV6_NOSSL_URI);
-	}
-
 	@Override
 	@Nullable
 	protected URI getIPv4Uri() {
-		return this.ipv4Uri;
+		return IPV4_URI;
 	}
 
 	@Override
 	@Nullable
 	protected URI getIPv6Uri() {
-		return this.ipv6Uri;
+		return IPV6_URI;
 	}
 
 	@Override
