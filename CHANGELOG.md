@@ -8,6 +8,11 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
+### v0.1.1 (2021-03-13)
+* Initial release
+* ipv6-test.com address detection support
+* Only use SSL services for address detection
+
 ### v0.1.0-beta1 (2021-03-07)
 * Initial release
 * AWS/Route53 DNS backend support
