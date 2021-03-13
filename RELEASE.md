@@ -8,10 +8,9 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-### v0.1.0-beta1 (2021-03-07)
+### v0.1.1 (2021-03-13)
 * Initial release
-* AWS/Route53 DNS backend support
-* ipify.org address detection support
-* ip4/6.me address detection support
+* ipv6-test.com address detection support
+* Only use SSL services for address detection
 
 See full [changelog](https://github.com/hdecarne/ddns-updater/blob/master/CHANGELOG.md).
