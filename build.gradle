@@ -1,8 +1,11 @@
 // Plugins
 plugins {
-	id "de.carne.java-tools" version "0.9.1"
-	id "org.sonarqube" version "3.1"
-	id "org.owasp.dependencycheck" version "6.0.5"
+	id "java"
+	id "jacoco"
+	id "distribution"
+	id "eclipse"
+	id "de.carne.java-tools" version "1.0.0"
+	id "org.sonarqube" version "3.1.1"
 }
 
 // Build helpers
@@ -32,12 +35,6 @@ javatools {
 // Projects
 defaultTasks "classes", "testClasses"
 
-apply plugin: "java"
-apply plugin: "de.carne.java-tools"
-apply plugin: "jacoco"
-apply plugin: "distribution"
-apply plugin: "eclipse"
-
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
@@ -55,8 +52,8 @@ dependencies {
 	implementation(group: "software.amazon.awssdk", name: "route53", version: rootProject.awsSdkVersion) {
 		exclude(group: "software.amazon.awssdk", module: "netty-nio-client")
 	}
-	runtime(group: "org.slf4j", name: "slf4j-api", version: project.slf4jVersion)
-	runtime(group: "org.slf4j", name: "slf4j-jdk14", version: project.slf4jVersion)
+	runtimeOnly(group: "org.slf4j", name: "slf4j-api", version: project.slf4jVersion)
+	runtimeOnly(group: "org.slf4j", name: "slf4j-jdk14", version: project.slf4jVersion)
 	testImplementation(group: "de.carne", name: "java-test", version: project.javaTestVersion)
 	testImplementation(group: "org.mockito", name: "mockito-junit-jupiter", version: project.mockitoJunitJupiterVersion)
 	testImplementation(group: "org.mockito", name: "mockito-inline", version: project.mockitoVersion)
