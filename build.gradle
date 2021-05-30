@@ -55,7 +55,7 @@ dependencies {
 	runtimeOnly(group: "org.slf4j", name: "slf4j-api", version: project.slf4jVersion)
 	runtimeOnly(group: "org.slf4j", name: "slf4j-jdk14", version: project.slf4jVersion)
 	testImplementation(group: "de.carne", name: "java-test", version: project.javaTestVersion)
-	testImplementation(group: "org.mockito", name: "mockito-junit-jupiter", version: project.mockitoJunitJupiterVersion)
+	testImplementation(group: "org.mockito", name: "mockito-junit-jupiter", version: project.mockitoVersion)
 	testImplementation(group: "org.mockito", name: "mockito-inline", version: project.mockitoVersion)
 }
 
