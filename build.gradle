@@ -73,10 +73,8 @@ jacoco {
 
 jacocoTestReport {
 	reports {
-		xml.enabled true
+		xml.required
 		xml.destination file("${buildDir}/reports/jacoco/coverage.xml")
-		html.enabled false
-		csv.enabled false
 	}
 }
 test.finalizedBy jacocoTestReport
