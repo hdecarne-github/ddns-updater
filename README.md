@@ -1,5 +1,5 @@
 [![Downloads](https://img.shields.io/github/downloads/hdecarne/ddns-updater/total.svg)](https://github.com/hdecarne/ddns-updater/releases)
-![Build](https://github.com/hdecarne/ddns-updater/actions/workflows/build-on-linux.yml/badge.svg)
+|![Build](https://github.com/hdecarne/ddns-updater/actions/workflows/build-on-linux.yml/badge.svg)](https://github.com/hdecarne/ddns-updater/actions)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.carne%3Addns-updater&metric=coverage)](https://sonarcloud.io/dashboard?id=de.carne%3Addns-updater)
 
 ## About DDNS Updater
