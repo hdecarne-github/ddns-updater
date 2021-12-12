@@ -28,7 +28,11 @@ jobs:
       - name: Init Build
         run: ./gradlew -s --refresh-dependencies clean classes testClasses dependencyCheckUpdate
       - name: Run Build
-        run: ./gradlew -s build javadoc sonarqube dependencyCheckAnalyze
+        run: ./gradlew -s build javadoc
+      - name: Run SonarQube
+        run: ./gradlew -s sonarqube
+      - name: Run OWASP dependency check
+        run: ./gradlew -s dependencyCheckAnalyze
       - name: Upload Reports
         uses: actions/upload-artifact@v2
         with:
