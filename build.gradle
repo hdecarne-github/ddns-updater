@@ -13,8 +13,8 @@ plugins {
 def snapshotBuild = project.version.endsWith("-SNAPSHOT")
 def releaseBuild = !snapshotBuild
 
-def mavenReleaseRepository = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-def mavenSnapshotRepository = "https://oss.sonatype.org/content/repositories/snapshots/"
+def mavenReleaseRepository = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+def mavenSnapshotRepository = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 
 def resolveProperty(propertyName, envName, defValue = "<undefined>") {
 	return ((project.findProperty(propertyName) ?: System.getenv(envName)) ?: defValue);
