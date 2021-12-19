@@ -13,4 +13,4 @@ GNU General Public License for more details.
 * ipv6-test.com address detection support
 * Only use SSL services for address detection
 
-See full [changelog](https://github.com/hdecarne/ddns-updater/blob/master/CHANGELOG.md).
+See full [changelog](https://github.com/hdecarne-github/ddns-updater/blob/master/CHANGELOG.md).

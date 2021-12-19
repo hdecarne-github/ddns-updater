@@ -1,5 +1,5 @@
-[![Downloads](https://img.shields.io/github/downloads/hdecarne/ddns-updater/total.svg)](https://github.com/hdecarne/ddns-updater/releases)
-[![Build](https://github.com/hdecarne/ddns-updater/actions/workflows/build-on-linux.yml/badge.svg)](https://github.com/hdecarne/ddns-updater/actions/workflows/build-on-linux.yml)
+[![Downloads](https://img.shields.io/github/downloads/hdecarne/ddns-updater/total.svg)](https://github.com/hdecarne-github/ddns-updater/releases)
+[![Build](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build-on-linux.yml/badge.svg)](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build-on-linux.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.carne%3Addns-updater&metric=coverage)](https://sonarcloud.io/dashboard?id=de.carne%3Addns-updater)
 
 ## About DDNS Updater
@@ -10,7 +10,7 @@ Depending on the actual command line the tool:
 
 #### Installation & usage:
 A Java SE 11 Runtime Environment is required to run ddns-updater.
-Download the latest version from the project's [releases page](https://github.com/hdecarne/ddns-updater/releases/latest) and simply extract it to a folder of your choice.
+Download the latest version from the project's [releases page](https://github.com/hdecarne-github/ddns-updater/releases/latest) and simply extract it to a folder of your choice.
 The archive contains a single executable Jar as well as a folder with the license information. Invoke the application via the command
 
 ```

@@ -6,7 +6,7 @@ Depending on the actual command line the tool:
 
 #### Installation & usage:
 A Java SE 11 Runtime Environment is required to run ddns-updater.
-Download the latest version from the project's [releases page](https://github.com/hdecarne/ddns-updater/releases/latest) and simply extract it to a folder of your choice.
+Download the latest version from the project's [releases page](https://github.com/hdecarne-github/ddns-updater/releases/latest) and simply extract it to a folder of your choice.
 The archive contains a single executable Jar as well as a folder with the license information. Invoke the application via the command
 
 ```
