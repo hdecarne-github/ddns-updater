@@ -26,5 +26,5 @@ func Timestamp() string {
 }
 
 func FullVersion() string {
-	return fmt.Sprintf("certd version %s (%s) %s/%s", Version(), Timestamp(), runtime.GOOS, runtime.GOARCH)
+	return fmt.Sprintf("ddns-updater version %s (%s) %s/%s", Version(), Timestamp(), runtime.GOOS, runtime.GOARCH)
 }

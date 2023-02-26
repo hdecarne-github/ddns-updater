@@ -10,7 +10,6 @@ package ddnsupdater
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"time"
@@ -49,6 +48,7 @@ func (cmd *ddnsupdater) Run() error {
 		return err
 	}
 	cmd.applyGlobalConfig(config)
+	cmd.logger.Info().Msg(FullVersion())
 	finders := cmd.evalFinderConfigs(config)
 	updaters := cmd.evalUpdaterConfigs(config)
 	if len(finders) == 0 {
@@ -72,10 +72,12 @@ func (cmd *ddnsupdater) Run() error {
 		if err != nil {
 			return err
 		}
-		// Only flush after successful DNS update
-		err = cache.Flush()
-		if err != nil {
-			return err
+		// Only flush if DNS has changed
+		if !cmd.Pretend {
+			err = cache.Flush()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -149,6 +151,8 @@ func (cmd *ddnsupdater) updateRequired(ips []net.IP) bool {
 	if updateRequired {
 		cmd.logger.Info().Msg("DNS update required")
 		cache.Put(cacheContext, lastUpdateCacheKey, update)
+	} else {
+		cmd.logger.Info().Msg("DNS still up-to-date, skipping update")
 	}
 	return updateRequired
 }
@@ -158,7 +162,7 @@ func (cmd *ddnsupdater) readConfig() (*ddnsupdaterConfig, error) {
 	if configFile == "" {
 		configFile = defaultConfigFile
 	}
-	configData, err := ioutil.ReadFile(configFile)
+	configData, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file '%s'\n\tcause: %v", configFile, err)
 	}

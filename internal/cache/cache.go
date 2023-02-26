@@ -82,7 +82,7 @@ func newDefaultProvider(persistent bool) Provider {
 	}
 	if cacheFile != "" {
 		_, err := toml.DecodeFile(cacheFile, &cache)
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			logger.Warn().Err(err).Msgf("Failed to read cache file '%s'\n\tcause: %v", cacheFile, err)
 		}
 	}

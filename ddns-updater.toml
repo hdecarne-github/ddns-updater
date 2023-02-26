@@ -1,14 +1,14 @@
 [global]
 verbose = true
-debug = false
+debug = true
 cache_enabled = true
 cache_duration = "24h"
 
 [address_interface]
-ipv4 = false
+ipv4 = true
 ipv6 = true
 private = false
-interface = "e*"
+interface = "*"
 
 [address_upnp]
 ipv4 = true

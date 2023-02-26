@@ -170,7 +170,7 @@ func (u *route53Updater) updateRRSs(ctx context.Context, client *route53.Client,
 		if err != nil {
 			return fmt.Errorf("changing resource record sets for zone id %s failed\t\ncause: %v", *zone.Id, err)
 		}
-		u.logger.Info().Msgf("DDNS update applied (%s/%s)", *crrssOutput.ChangeInfo.Id, crrssOutput.ChangeInfo.Status)
+		u.logger.Info().Msgf("DDNS update applied (%s:%s)", *crrssOutput.ChangeInfo.Id, crrssOutput.ChangeInfo.Status)
 	} else {
 		u.logger.Warn().Msg("DDNS update skipped due to pretend")
 	}
