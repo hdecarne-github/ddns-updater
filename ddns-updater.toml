@@ -1,7 +1,7 @@
 [global]
 verbose = true
 debug = false
-cache_type = "none"
+cache_enabled = true
 cache_duration = "24h"
 
 [address_interface]

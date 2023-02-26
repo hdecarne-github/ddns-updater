@@ -14,12 +14,13 @@ import (
 )
 
 func TestDefaultCache(t *testing.T) {
+	context := "TestDefaultCache"
 	key := "key"
-	miss := Get(key)
-	require.Equal(t, miss, "")
+	miss := Get0(context, key)
+	require.Equal(t, "", miss)
 	value := "value"
-	Put(key, value)
-	hit := Get(key)
+	Put0(context, key, value)
+	hit := Get0(context, key)
 	require.Equal(t, value, hit)
 	err := Flush()
 	require.NoError(t, err)

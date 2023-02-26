@@ -17,6 +17,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/alecthomas/kong"
+	"github.com/hdecarne-github/ddns-updater/internal/cache"
 	"github.com/hdecarne-github/ddns-updater/internal/logging"
 	"github.com/hdecarne-github/ddns-updater/pkg/address"
 	"github.com/hdecarne-github/ddns-updater/pkg/address/iface"
@@ -57,7 +58,14 @@ func (cmd *ddnsupdater) Run() error {
 		}
 		if len(ips) > 0 {
 			ips = cmd.normalizeIPs(ips)
-			cmd.updateIPs(updaters, ips)
+			err = cmd.updateIPs(updaters, ips)
+			if err != nil {
+				return err
+			}
+			err = cache.Flush()
+			if err != nil {
+				return err
+			}
 		} else {
 			cmd.logger.Warn().Msg("No addresses found, nothing to update")
 		}
@@ -153,6 +161,9 @@ func (cmd *ddnsupdater) evalFinderConfigs(config *ddnsupdaterConfig) []address.F
 		finder := web.NewWebFinder(&config.WebAddressFinder)
 		finders = append(finders, finder)
 	}
+	if config.Global.CacheEnabled {
+		cache.EnableCaching(config.Global.CacheDuration)
+	}
 	return finders
 }
 
@@ -181,7 +192,7 @@ type ddnsupdaterConfig struct {
 type globalConfig struct {
 	Verbose       bool          `toml:"verbose"`
 	Debug         bool          `toml:"debug"`
-	Cache         string        `toml:"cache"`
+	CacheEnabled  bool          `toml:"cache_enabled"`
 	CacheDuration time.Duration `toml:"cache_duration"`
 }
 

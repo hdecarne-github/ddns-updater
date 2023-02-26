@@ -12,11 +12,14 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/hdecarne-github/ddns-updater/internal/cache"
 	"github.com/hdecarne-github/ddns-updater/internal/logging"
 	"github.com/hdecarne-github/ddns-updater/pkg/address"
 	"github.com/rs/zerolog"
 	"gitlab.com/NebulousLabs/go-upnp"
 )
+
+const igdLocationCacheKey = "igd_location"
 
 type UPnPFinderConfig struct {
 	address.FinderConfig
@@ -41,14 +44,8 @@ func (f *upnpFinder) Name() string {
 func (f *upnpFinder) Run() ([]net.IP, error) {
 	f.logger.Info().Msg("Discovering UPnP devices...")
 	found := make([]net.IP, 0)
-	ctx := context.Background()
-	igd, err := upnp.DiscoverCtx(ctx)
-	if err != nil {
-		f.logger.Warn().Msgf("No IGD device discovered")
-		return found, nil
-	}
-	f.logger.Debug().Msgf("IGD discovered at location '%s'", igd.Location())
-	f.logger.Debug().Msgf("Querying external IP from IGD at location '%s'...", igd.Location())
+	igd := f.lookupIGD()
+	f.logger.Debug().Msgf("Using IGD at '%s'", igd.Location())
 	ipString, err := igd.ExternalIP()
 	if err != nil {
 		return nil, fmt.Errorf("failed to query external IP from IGD '%s'\n\tcause: %v", igd.Location(), err)
@@ -68,4 +65,21 @@ func (f *upnpFinder) Run() ([]net.IP, error) {
 		found = append(found, ip)
 	}
 	return found, nil
+}
+
+func (f *upnpFinder) lookupIGD() *upnp.IGD {
+	location := cache.Get0(f.Name(), igdLocationCacheKey)
+	if location != "" {
+		igd, _ := upnp.Load(location)
+		cache.Put0(f.Name(), igdLocationCacheKey, igd.Location())
+		return igd
+	}
+	ctx := context.Background()
+	igd, err := upnp.DiscoverCtx(ctx)
+	if err != nil {
+		f.logger.Warn().Msgf("No IGD device discovered")
+		return nil
+	}
+	cache.Put0(f.Name(), igdLocationCacheKey, igd.Location())
+	return igd
 }
