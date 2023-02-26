@@ -8,7 +8,7 @@ cache_duration = "24h"
 ipv4 = false
 ipv6 = true
 private = false
-interface = "en0"
+interface = "e*"
 
 [address_upnp]
 ipv4 = true

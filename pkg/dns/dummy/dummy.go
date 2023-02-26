@@ -38,7 +38,7 @@ func (u *dummyUpdater) Name() string {
 	return u.name
 }
 
-func (u *dummyUpdater) Merge(ips []net.IP, pretend bool) error {
+func (u *dummyUpdater) Merge(ips []net.IP, force bool, pretend bool) error {
 	u.logger.Info().Msgf("Updating host '%s'...", u.cfg.Host)
 	for _, ip := range ips {
 		if len(ip) == 4 {

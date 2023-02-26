@@ -23,6 +23,8 @@ import (
 
 const Name = "dns_route53"
 
+const lastUpdateIPsCacheKey = "last_update_ips"
+
 type Route53UpdaterConfig struct {
 	dns.UpdaterConfig
 	Key    string `toml:"key"`
@@ -46,7 +48,7 @@ func (u *route53Updater) Name() string {
 	return u.name
 }
 
-func (u *route53Updater) Merge(ips []net.IP, pretend bool) error {
+func (u *route53Updater) Merge(ips []net.IP, force bool, pretend bool) error {
 	u.logger.Info().Msgf("Updating host '%s'...", u.cfg.Host)
 	options := route53.Options{
 		Credentials: credentials.NewStaticCredentialsProvider(u.cfg.Key, u.cfg.Secret, ""),

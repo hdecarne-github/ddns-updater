@@ -57,6 +57,7 @@ func Flush() error {
 }
 
 type defaultProvider struct {
+	modified  bool
 	cache     map[string]*cacheEntry
 	cacheFile string
 	logger    zerolog.Logger
@@ -85,7 +86,7 @@ func newDefaultProvider(persistent bool) Provider {
 			logger.Warn().Err(err).Msgf("Failed to read cache file '%s'\n\tcause: %v", cacheFile, err)
 		}
 	}
-	return &defaultProvider{cache: cache, cacheFile: cacheFile, logger: logger}
+	return &defaultProvider{modified: false, cache: cache, cacheFile: cacheFile, logger: logger}
 }
 
 func (p *defaultProvider) Get(key string) []string {
@@ -97,10 +98,14 @@ func (p *defaultProvider) Get(key string) []string {
 }
 
 func (p *defaultProvider) Put(key string, values []string, validity time.Duration) {
+	p.modified = true
 	p.cache[key] = &cacheEntry{ValidTill: time.Now().Add(validity), Values: values}
 }
 
 func (p *defaultProvider) Flush() error {
+	if !p.modified {
+		return nil
+	}
 	now := time.Now()
 	for key, entry := range p.cache {
 		if now.After(entry.ValidTill) {
@@ -108,6 +113,7 @@ func (p *defaultProvider) Flush() error {
 		}
 	}
 	if p.cacheFile != "" {
+		p.logger.Debug().Msgf("Writing cache file '%s'...", p.cacheFile)
 		cacheFileDir := filepath.Dir(p.cacheFile)
 		err := os.MkdirAll(cacheFileDir, os.ModePerm)
 		if err != nil {

@@ -15,7 +15,7 @@ import (
 
 type Updater interface {
 	Name() string
-	Merge(ips []net.IP, pretend bool) error
+	Merge(ips []net.IP, force bool, pretend bool) error
 }
 
 type UpdaterConfig struct {

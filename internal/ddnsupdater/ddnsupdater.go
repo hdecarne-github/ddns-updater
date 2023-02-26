@@ -31,9 +31,13 @@ import (
 
 const defaultConfigFile = "/etc/ddns-updater/ddns-updater.toml"
 
+const cacheContext = "global"
+const lastUpdateCacheKey = "last_update"
+
 type ddnsupdater struct {
 	Config  string `help:"Use this config file"`
 	Pretend bool   `help:"Only show changes, but do not apply them"`
+	Force   bool   `help:"Force DNS update"`
 	Verbose bool   `help:"Enable verbose output"`
 	Debug   bool   `help:"Enable debug output"`
 	logger  zerolog.Logger
@@ -56,18 +60,22 @@ func (cmd *ddnsupdater) Run() error {
 		if err != nil {
 			return err
 		}
-		if len(ips) > 0 {
-			ips = cmd.normalizeIPs(ips)
-			err = cmd.updateIPs(updaters, ips)
-			if err != nil {
-				return err
-			}
-			err = cache.Flush()
-			if err != nil {
-				return err
-			}
-		} else {
+		if len(ips) == 0 {
 			cmd.logger.Warn().Msg("No addresses found, nothing to update")
+			return nil
+		}
+		ips = cmd.normalizeIPs(ips)
+		if !cmd.updateRequired(ips) {
+			return nil
+		}
+		err = cmd.updateIPs(updaters, ips)
+		if err != nil {
+			return err
+		}
+		// Only flush after successful DNS update
+		err = cache.Flush()
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -89,7 +97,7 @@ func (cmd *ddnsupdater) findIPs(finders []address.Finder) ([]net.IP, error) {
 func (cmd *ddnsupdater) updateIPs(updaters []dns.Updater, ips []net.IP) error {
 	cmd.logger.Info().Msg("Updating DNS...")
 	for _, updater := range updaters {
-		err := updater.Merge(ips, cmd.Pretend)
+		err := updater.Merge(ips, cmd.Force, cmd.Pretend)
 		if err != nil {
 			return err
 		}
@@ -118,6 +126,31 @@ func (cmd *ddnsupdater) normalizeIPs(ips []net.IP) []net.IP {
 		}
 	}
 	return normalized
+}
+
+func (cmd *ddnsupdater) updateRequired(ips []net.IP) bool {
+	update := make([]string, len(ips))
+	for i, ip := range ips {
+		update[i] = ip.String()
+	}
+	if cmd.Force {
+		cmd.logger.Info().Msg("DNS update forced")
+		cache.Put(cacheContext, lastUpdateCacheKey, update)
+		return true
+	}
+	lastUpdate := cache.Get(cacheContext, lastUpdateCacheKey)
+	updateRequired := len(update) != len(lastUpdate)
+	for i, lastUpdateI := range lastUpdate {
+		if updateRequired {
+			break
+		}
+		updateRequired = lastUpdateI != update[i]
+	}
+	if updateRequired {
+		cmd.logger.Info().Msg("DNS update required")
+		cache.Put(cacheContext, lastUpdateCacheKey, update)
+	}
+	return updateRequired
 }
 
 func (cmd *ddnsupdater) readConfig() (*ddnsupdaterConfig, error) {
