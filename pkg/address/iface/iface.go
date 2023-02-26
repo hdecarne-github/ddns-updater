@@ -23,7 +23,7 @@ type IFaceFinderConfig struct {
 }
 
 func NewIFaceFinder(cfg *IFaceFinderConfig) address.Finder {
-	name := fmt.Sprintf("address.interface[%s]", cfg.IFace)
+	name := fmt.Sprintf("address_interface[%s]", cfg.IFace)
 	logger := logging.RootLogger().With().Str("finder", name).Logger()
 	return &ifaceFinder{cfg: cfg, name: name, logger: logger}
 }
