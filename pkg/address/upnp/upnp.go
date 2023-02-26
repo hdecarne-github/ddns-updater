@@ -40,10 +40,12 @@ func (f *upnpFinder) Name() string {
 
 func (f *upnpFinder) Run() ([]net.IP, error) {
 	f.logger.Info().Msg("Discovering UPnP devices...")
+	found := make([]net.IP, 0)
 	ctx := context.Background()
 	igd, err := upnp.DiscoverCtx(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("no UPnP device found\n\tcause: %v", err)
+		f.logger.Warn().Msgf("No IGD device discovered")
+		return found, nil
 	}
 	f.logger.Debug().Msgf("IGD discovered at location '%s'", igd.Location())
 	f.logger.Debug().Msgf("Querying external IP from IGD at location '%s'...", igd.Location())
@@ -61,7 +63,6 @@ func (f *upnpFinder) Run() ([]net.IP, error) {
 	if ipv4 != nil {
 		ip = ipv4
 	}
-	found := make([]net.IP, 0)
 	if f.cfg.IsMatch(ip) {
 		f.logger.Info().Msgf("Found address %s", ip)
 		found = append(found, ip)

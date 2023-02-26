@@ -12,7 +12,7 @@ interface = "en0"
 
 [address_upnp]
 ipv4 = true
-ipv6 = false
+ipv6 = true
 
 [address_web]
 ipv4 = true
