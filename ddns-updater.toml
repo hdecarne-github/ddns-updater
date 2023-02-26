@@ -1,0 +1,40 @@
+[global]
+verbose = true
+debug = false
+cache_type = "none"
+cache_duration = "24h"
+
+[address_interface]
+ipv4 = false
+ipv6 = true
+private = false
+interface = "en0"
+
+[address_upnp]
+ipv4 = true
+ipv6 = false
+
+[address_web]
+ipv4 = true
+ipv6 = true
+ipv4_specs = [
+        ["https://ip4only.me/api/", "IPv4,([^,]*),.*"],
+        ["https://api.ipify.org/", ".*"],
+        ["https://v4.ipv6-test.com/api/myip.php", ".*"]
+    ]
+ipv6_specs = [
+        ["https://ip6only.me/api/", "IPv6,([^,]*),.*"],
+        ["https://api6.ipify.org/", ".*"],
+        ["https://v6.ipv6-test.com/api/myip.php", ".*"]
+    ]
+
+[dns_dummy]
+enabled = true
+host = "myserver.mydomain.net"
+
+[dns_route53]
+enabled = false
+host = "myserver.mydomain.net"
+key = "<key>"
+secret = "<secret>"
+region = "global"
