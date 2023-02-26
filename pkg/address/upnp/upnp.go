@@ -45,6 +45,9 @@ func (f *upnpFinder) Run() ([]net.IP, error) {
 	f.logger.Info().Msg("Discovering UPnP devices...")
 	found := make([]net.IP, 0)
 	igd := f.lookupIGD()
+	if igd == nil {
+		return found, nil
+	}
 	f.logger.Debug().Msgf("Using IGD at '%s'", igd.Location())
 	ipString, err := igd.ExternalIP()
 	if err != nil {
