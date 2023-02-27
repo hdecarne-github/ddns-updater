@@ -23,8 +23,6 @@ import (
 
 const Name = "dns_route53"
 
-const lastUpdateIPsCacheKey = "last_update_ips"
-
 type Route53UpdaterConfig struct {
 	dns.UpdaterConfig
 	Key    string `toml:"key"`
