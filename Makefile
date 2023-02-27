@@ -6,7 +6,7 @@ GO := $(shell command -v go 2> /dev/null)
 
 ifdef GO
 GOOS ?= $(shell go env GOOS)
-LDFLAGS := $(LDFLAGS) -X $(GOMODULE)/internal/ddnsupdater.version=$(GOMODULE_VERSION) -X $(GOMODULE)/internal/ddnsupdater.timestamp=$(shell date +%Y%m%d%H%M%S)
+LDFLAGS := $(LDFLAGS) -X $(GOMODULE)/internal/buildinfo.version=$(GOMODULE_VERSION) -X $(GOMODULE)/internal/buildinfo.timestamp=$(shell date +%Y%m%d%H%M%S)
 ifneq (windows, $(GOOS))
 GOCMDEXT :=
 else

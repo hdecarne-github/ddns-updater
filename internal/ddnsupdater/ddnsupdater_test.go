@@ -22,7 +22,7 @@ func TestReadConfig(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-	os.Args = []string{"ddns-updater", "--config=../../ddns-updater.toml", "--pretend"}
+	os.Args = []string{"ddns-updater", "--config=./testdata/ddns-updater.toml", "--pretend"}
 	err := Run()
 	require.NoError(t, err)
 }

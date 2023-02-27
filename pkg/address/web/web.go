@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/hdecarne-github/ddns-updater/internal/httpclient"
 	"github.com/hdecarne-github/ddns-updater/internal/logging"
 	"github.com/hdecarne-github/ddns-updater/pkg/address"
 	"github.com/rs/zerolog"
@@ -22,8 +23,9 @@ import (
 
 type WebFinderConfig struct {
 	address.FinderConfig
-	IPv4Specs [][2]string `toml:"ipv4_specs"`
-	IPv6Specs [][2]string `toml:"ipv6_specs"`
+	IPv4Specs     [][2]string `toml:"ipv4_specs"`
+	IPv6Specs     [][2]string `toml:"ipv6_specs"`
+	TLSSkipVerify bool        `toml:"tls_skip_verify"`
 }
 
 func NewWebFinder(cfg *WebFinderConfig) address.Finder {
@@ -44,9 +46,10 @@ func (f *webFinder) Name() string {
 
 func (f *webFinder) Run() ([]net.IP, error) {
 	found := make([]net.IP, 0)
+	client := httpclient.PrepareClient(httpclient.DefaultTimeout, f.cfg.TLSSkipVerify)
 	if f.cfg.FinderConfig.IPv4 {
 		for _, spec := range f.cfg.IPv4Specs {
-			ip, err := f.runIPv4Spec(spec)
+			ip, err := f.runIPv4Spec(client, spec)
 			if err != nil {
 				continue
 			}
@@ -59,7 +62,7 @@ func (f *webFinder) Run() ([]net.IP, error) {
 	}
 	if f.cfg.FinderConfig.IPv6 {
 		for _, spec := range f.cfg.IPv6Specs {
-			ip, err := f.runIPv6Spec(spec)
+			ip, err := f.runIPv6Spec(client, spec)
 			if err != nil {
 				continue
 			}
@@ -73,8 +76,8 @@ func (f *webFinder) Run() ([]net.IP, error) {
 	return found, nil
 }
 
-func (f *webFinder) runIPv4Spec(spec [2]string) (net.IP, error) {
-	ip, err := f.runSpec(spec)
+func (f *webFinder) runIPv4Spec(client *http.Client, spec [2]string) (net.IP, error) {
+	ip, err := f.runSpec(client, spec)
 	if err != nil {
 		return ip, err
 	}
@@ -85,8 +88,8 @@ func (f *webFinder) runIPv4Spec(spec [2]string) (net.IP, error) {
 	return ipv4, nil
 }
 
-func (f *webFinder) runIPv6Spec(spec [2]string) (net.IP, error) {
-	ip, err := f.runSpec(spec)
+func (f *webFinder) runIPv6Spec(client *http.Client, spec [2]string) (net.IP, error) {
+	ip, err := f.runSpec(client, spec)
 	if err != nil {
 		return ip, err
 	}
@@ -97,7 +100,7 @@ func (f *webFinder) runIPv6Spec(spec [2]string) (net.IP, error) {
 	return ipv6, nil
 }
 
-func (f *webFinder) runSpec(spec [2]string) (net.IP, error) {
+func (f *webFinder) runSpec(client *http.Client, spec [2]string) (net.IP, error) {
 	url, err := url.Parse(spec[0])
 	if err != nil {
 		return nil, fmt.Errorf("invalid url '%s'\n\tcause: %v", spec[0], err)
@@ -107,7 +110,7 @@ func (f *webFinder) runSpec(spec [2]string) (net.IP, error) {
 		return nil, fmt.Errorf("invalid regexp '%s'\n\tcause: %v", spec[1], err)
 	}
 	f.logger.Info().Msgf("Querying address service '%s'...", url.String())
-	rsp, err := http.Get(url.String())
+	rsp, err := client.Get(url.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to query url '%s'\n\tcause: %v", url.String(), err)
 	}

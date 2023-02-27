@@ -16,15 +16,17 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/alecthomas/kong"
+	"github.com/hdecarne-github/ddns-updater/internal/buildinfo"
 	"github.com/hdecarne-github/ddns-updater/internal/cache"
 	"github.com/hdecarne-github/ddns-updater/internal/logging"
 	"github.com/hdecarne-github/ddns-updater/pkg/address"
 	"github.com/hdecarne-github/ddns-updater/pkg/address/iface"
 	"github.com/hdecarne-github/ddns-updater/pkg/address/upnp"
-	"github.com/hdecarne-github/ddns-updater/pkg/address/web"
+	addressweb "github.com/hdecarne-github/ddns-updater/pkg/address/web"
 	"github.com/hdecarne-github/ddns-updater/pkg/dns"
 	"github.com/hdecarne-github/ddns-updater/pkg/dns/dummy"
 	"github.com/hdecarne-github/ddns-updater/pkg/dns/route53"
+	dnsweb "github.com/hdecarne-github/ddns-updater/pkg/dns/web"
 	"github.com/rs/zerolog"
 )
 
@@ -48,7 +50,7 @@ func (cmd *ddnsupdater) Run() error {
 		return err
 	}
 	cmd.applyGlobalConfig(config)
-	cmd.logger.Info().Msg(FullVersion())
+	cmd.logger.Info().Msg(buildinfo.FullVersion())
 	finders := cmd.evalFinderConfigs(config)
 	updaters := cmd.evalUpdaterConfigs(config)
 	if len(finders) == 0 {
@@ -195,7 +197,7 @@ func (cmd *ddnsupdater) evalFinderConfigs(config *ddnsupdaterConfig) []address.F
 		finders = append(finders, finder)
 	}
 	if config.WebAddressFinder.IsEnabled() {
-		finder := web.NewWebFinder(&config.WebAddressFinder)
+		finder := addressweb.NewWebFinder(&config.WebAddressFinder)
 		finders = append(finders, finder)
 	}
 	if config.Global.CacheEnabled {
@@ -214,6 +216,10 @@ func (cmd *ddnsupdater) evalUpdaterConfigs(config *ddnsupdaterConfig) []dns.Upda
 		updater := route53.NewRoute53Updater(&config.Route53UpdaterConfig)
 		updaters = append(updaters, updater)
 	}
+	if config.WebUpdaterConfig.IsEnabled(dnsweb.Name) {
+		updater := dnsweb.NewWebUpdater(&config.WebUpdaterConfig)
+		updaters = append(updaters, updater)
+	}
 	return updaters
 }
 
@@ -221,9 +227,10 @@ type ddnsupdaterConfig struct {
 	Global               globalConfig                 `toml:"global"`
 	IFaceAddressFinder   iface.IFaceFinderConfig      `toml:"address_interface"`
 	UPnPAddressFinder    upnp.UPnPFinderConfig        `toml:"address_upnp"`
-	WebAddressFinder     web.WebFinderConfig          `toml:"address_web"`
+	WebAddressFinder     addressweb.WebFinderConfig   `toml:"address_web"`
 	DummyUpdaterConfig   dummy.DummyUpdaterConfig     `toml:"dns_dummy"`
 	Route53UpdaterConfig route53.Route53UpdaterConfig `toml:"dns_route53"`
+	WebUpdaterConfig     dnsweb.WebUpdaterConfig      `toml:"dns_web"`
 }
 
 type globalConfig struct {

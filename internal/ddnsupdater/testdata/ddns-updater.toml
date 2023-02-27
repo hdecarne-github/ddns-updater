@@ -1,0 +1,51 @@
+[global]
+verbose = true
+debug = true
+cache_enabled = true
+cache_duration = "24h"
+
+[address_interface]
+ipv4 = true
+ipv6 = true
+private = false
+interface = "*"
+
+[address_upnp]
+ipv4 = true
+ipv6 = true
+
+[address_web]
+ipv4 = true
+ipv6 = true
+ipv4_specs = [
+        ["https://ip4only.me/api/", "IPv4,([^,]*),.*"],
+        ["https://api.ipify.org/", ".*"],
+        ["https://v4.ipv6-test.com/api/myip.php", ".*"]
+    ]
+ipv6_specs = [
+        ["https://ip6only.me/api/", "IPv6,([^,]*),.*"],
+        ["https://api6.ipify.org/", ".*"],
+        ["https://v6.ipv6-test.com/api/myip.php", ".*"]
+    ]
+
+[dns_dummy]
+enabled = true
+host = "myserver.mydomain.net"
+
+[dns_route53]
+enabled = false
+host = "myserver.mydomain.net"
+key = "<key>"
+secret = "<secret>"
+region = "global"
+
+[dns_web]
+enabled = false
+host = "myserver.mydomain.net"
+username = "<username>"
+password = "<password>"
+url = "<update url>"
+# dyn.com
+#url = "https://members.dyndns.org/v3/update?hostname={hostname}&myip={myips}"
+# noip.com
+#url = "https://dynupdate.no-ip.com/nic/update?hostname={hostname}&myip={myips}"

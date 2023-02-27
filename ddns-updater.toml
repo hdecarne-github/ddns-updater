@@ -1,20 +1,49 @@
 [global]
+# The following two flags define how much output ddns-updater generates. Setting verbose to true causes
+# informative output and setting debug to true causes additional details. Setting both to false instructs
+# ddns-updater to only generate output in case of an update or an error.
+# Both flags can also be enabled via the command line (--verbose or --debug).
 verbose = true
-debug = true
+debug = false
+# The cache is used to remember states between consecutive ddns-updater runs. Especially the last DNS update.
+# Disabling the cache causes ddns-updater to update DNS on every run. The cache duration defines after which
+# time cached information is discarded. This especially defines after which time a DNS update will be done
+# anyway. The defaults (true + 24h) instruct ddns-updater to update DNS in case of changes, but latest 24h
+# after the last update.
 cache_enabled = true
 cache_duration = "24h"
 
+# Address finders:
+# The following blocks define the different mechanisms to determine the host's current addresses (IPv4 and IPv6).
+# The following options are common to all finders:
+#  ipv4: Setting this to true, instructs ddns-updater to collect & use IPv4 addresses via this finder.
+#  ipv6: Setting this to true, instructs ddns-updater to collect & use IPv6 addresses via this finder.
+#  private: Setting this to true, instructs ddns-updater to collect also private unicast addresses.
+#           Only enable this, if you know what you are doing.
+# Technically all finders can be used in combination. Resulting addresses will be merged and duplicates removed.
+# Advise is to only use the exact finders you need.
+
 [address_interface]
-ipv4 = true
+# Interface finder determines the host's addresses by querying its interfaces.
+# The interface option defines which interface has the relevant addresses assigned.
+# This option supports globing, means by setting it to "eth*" all interfaces beginning
+# with eth* are inspected.
+ipv4 = false
 ipv6 = true
 private = false
-interface = "*"
+interface = "eth0"
 
 [address_upnp]
+# UPnP finder uses the UPnP protocal to determine the router's external IPv4 address.
 ipv4 = true
-ipv6 = true
+ipv6 = false
 
 [address_web]
+# Web finder determines the host's addresses by querying external services.
+# You can list multiple services per IPv4 (ipv4_specs) and IPv6 (ipv6_specs).
+# Every spec consists of the service URL to invoke and a regular expression used
+# to extract the IP address from the returned output. See the examples below
+# for further details. The examples should work out-of-the-box.
 ipv4 = true
 ipv6 = true
 ipv4_specs = [
@@ -27,14 +56,40 @@ ipv6_specs = [
         ["https://api6.ipify.org/", ".*"],
         ["https://v6.ipv6-test.com/api/myip.php", ".*"]
     ]
+tls_skip_verify = false
 
-[dns_dummy]
-enabled = true
-host = "myserver.mydomain.net"
+# DNS updaters:
+# The following blocks define the different mechanisms to perform DNS updates.
+# The following options are common to all updaters:
+#  enabled: Enables the corresponding updater.
+#  host: The host name to updates (must not be empty).
+# Multiple updaters can be enabled at once, resulting in multiple DNS updates.
 
 [dns_route53]
+# Route53 updater uses the AWS Route53 API to update the named host's DNS information.
 enabled = false
 host = "myserver.mydomain.net"
 key = "<key>"
 secret = "<secret>"
 region = "global"
+
+[dns_web]
+# Web based updater for services like https://dyn.com/ or https://www.noip.com/. The updater
+# supports only up to one address per IPv4 or IPV6. Additional address will cause a warning
+# and are ignored. Furthermore the authentication is done via basic auth. The update URL is
+# a pattern. The contained placeholders will be substituted as follows:
+#  {hostname}: The hostname to update.
+#  {myipv4}: The IPv4 address to set.
+#  {myipv6}: The IPv6 address to set.
+# Not used placeholders are not set. Used but undefined placeholders will cause the update
+# to fail.
+enabled = false
+host = "myserver.mydomain.net"
+username = "<username>"
+password = "<password>"
+url = "<update url>"
+# dyn.com
+#url = "https://members.dyndns.org/v3/update?hostname={hostname}&myip={myipv4},{myipv6}"
+# noip.com
+#url = "https://dynupdate.no-ip.com/nic/update?hostname={hostname}&myip={myipv4},{myipv6}"
+tls_skip_verify = false

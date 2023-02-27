@@ -21,8 +21,9 @@ func TestWebFinder(t *testing.T) {
 			IPv6:    true,
 			Private: false,
 		},
-		IPv4Specs: [][2]string{{"https://ip4only.me/api/", "IPv4,([^,]*),.*"}},
-		IPv6Specs: [][2]string{{"https://ip6only.me/api/", "IPv6,([^,]*),.*"}},
+		IPv4Specs:     [][2]string{{"https://ip4only.me/api/", "IPv4,([^,]*),.*"}},
+		IPv6Specs:     [][2]string{{"https://ip6only.me/api/", "IPv6,([^,]*),.*"}},
+		TLSSkipVerify: false,
 	}
 	finder := NewWebFinder(cfg)
 	require.NotNil(t, finder)
