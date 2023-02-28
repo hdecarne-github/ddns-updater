@@ -11,8 +11,9 @@ The following DNS backends are supported:
 This software may be modified and distributed under the terms
 of the MIT license.  See the LICENSE file for details.
 
-### v0.2.0 (2023-mm-dd)
+### v0.2.0 (2023-02-28)
 * Release of completely rewritten Go based version
+* LICENSE changed to MIT license
 * Address finder mechanisms: Interface, UPnP, Web
 * DNS update mechanisms: AWS/Route53, Web
 
