@@ -1,54 +1,54 @@
-[![Downloads](https://img.shields.io/github/downloads/hdecarne/ddns-updater/total.svg)](https://github.com/hdecarne-github/ddns-updater/releases)
-[![Build](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build-on-linux.yml/badge.svg)](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build-on-linux.yml)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.carne%3Addns-updater&metric=coverage)](https://sonarcloud.io/dashboard?id=de.carne%3Addns-updater)
+[![Downloads](https://img.shields.io/github/downloads/hdecarne-github/ddns-updater/total.svg)](https://github.com/hdecarne-github/ddns-updater/releases)
+[![Build](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build.yml/badge.svg)](https://github.com/hdecarne-github/ddns-updater/actions/workflows/build.yml)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=hdecarne-github_ddns-updater&metric=coverage)](https://sonarcloud.io/summary/new_code?id=hdecarne-github_ddns-updater)
 
 ## About DDNS Updater
-ddns-updater is a command line tool to update an [AWS/Route53](https://aws.amazon.com/de/route53/) zone with the current IP addresses (IPv4 and/or IPv6) of the running host.
-Depending on the actual command line the tool:
-1. Determines the IP addresses of the running host.
-2. Updates the given host in the AWS/Route53 zone if it is no longer up-to-date. Every 24h an update is forced automatically. 
+ddns-updater is a command line tool to perform dynamic DNS (DDNS) updates. It provides various finder mechanisms to gather the
+running host's ip addresses and update mechanisms for several DNS backends.
+The following address detection mechanisms are supported:
+* Interface based (examining the addresses of the running host's interfaces)
+* UPnP based (querying the local network's router for the external IPv4 address)
+* Web based (querying one or more web based services to determine the running host's ip addresses)
+The following DNS backends are supported:
+* AWS/Route53 (updating AWS/Route53 zone information)
+* Web (invoking a web based service to update DNS)
 
-#### Installation & usage:
-A Java SE 11 Runtime Environment is required to run ddns-updater.
-Download the latest version from the project's [releases page](https://github.com/hdecarne-github/ddns-updater/releases/latest) and simply extract it to a folder of your choice.
-The archive contains a single executable Jar as well as a folder with the license information. Invoke the application via the command
+### Installation
+To install ddns-updater you have to download a suitable [release archive](https://github.com/hdecarne-github/ddns-updater/releases) and extract it or build it from source by cloning the repository and issueing a simple
+```
+make build
+```
+To build ddns-updater, Go version 1.20 or higher is required. The resulting binary will be written to **./build/bin**.
+Copy the either extracted or built tool binary to a location of your choice (e.g. /usr/local/bin/).
 
-```
-java -jar ddns-updater-boot-<version>.jar [command line arguments]
-```
+### Configuration
+The ddns-updater tool retrieves most of its configuration from a configuration file. See **ddns-updater.toml** as a reference and
+adapt it to your need. The default location of the configuration file is /etc/ddns-updater/ddns-updater.toml. An explicit location
+can be given via the --config command line option (see next section).
 
-The application command line supports the following options:
+### Usage
+The ddns-updater tool supports the following command line: 
 ```
-ddns-updater-boot-<version> [--verbose|--debug] [--quiet] [--credentials file] [--noipv4] [--noipv6] [--force] --host host
+ddns-updater [--verbose|--debug] [--config=<config file>] [--pretend] [--force] [--reset-cache]
 
 --verbose
-	Enable verbose logging.
+	Enable verbose output.
 --debug
-	Enable debug logging.
---quiet
-	Only emit messages in case of warnings or failure
---credentials file
-	Use <file> to read credentials (see below).
-	Defaults to ~/.de.carne.ddns/credentials.conf.
---noipv4
-	Do not detect and update IPv4 address.
---noipv6
-	Do not detect and update IPv6 address.
---force
-	Forces an update (even if the zone is considered up-to-date).
+	Enable debug output.
+--config=<config file>
+	Read configuration from file <config file>.
+	If this option is not set, configuration is read from /etc/ddns-updater/ddns-updater.toml.
 --pretend
-	Run but do not apply any DNS changes.
---host host
-	The host name to update.
+	Gather the host's ip addresses and prepare a DDNS update, but do not apply it.
+--force
+	Forces an update (even if the DNS information is considered up-to-date).
+--reset-cache
+	Clears the tool's cache to restart from scratch.
 ```
-
-### Credentials file
-See [example](https://raw.githubusercontent.com/hdecarne/ddns-updater/master/src/test/resources/credentials.conf).
 
 ### Changelog:
 See [CHANGELOG.md](https://raw.githubusercontent.com/hdecarne/ddns-updater/master/CHANGELOG.md).
 
-
 ### License
-This project is subject to the the GNU General Public License version 3 or later version.
-See LICENSE information for details.
+This project is subject to the the MIT License.
+See [LICENSE](https://raw.githubusercontent.com/hdecarne/ddns-updater/master/LICENSE) information for details.

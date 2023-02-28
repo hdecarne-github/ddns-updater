@@ -1,12 +1,20 @@
 ## Changelog:
-This is the initial release of ddns-updater.
-Only currently supported DNS backend is AWS/Route53.
-For IP address detection the services [ipv6-test.com](https://ipv6-test.com/), [ipify.org](https://www.ipify.org/) and [ip4.me](https://ip4.me/) are used.  
+This is the latest release of the ddns-updater tool capable of performing dynamic DNS (DDNS) updates.
+The following address detection mechanisms are supported:
+* Interface based (examining the addresses of the running host's interfaces)
+* UPnP based (querying the local network's router for the external IPv4 address)
+* Web based (querying one or more web based services to determine the running host's ip addresses)
+The following DNS backends are supported:
+* AWS/Route53 (updating AWS/Route53 zone information)
+* Web (invoking a web based service to update DNS)
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This software may be modified and distributed under the terms
+of the MIT license.  See the LICENSE file for details.
+
+### v0.2.0 (2023-mm-dd)
+* Release of Go based re-write
+* Address finder mechanisms: interface, upnp, web
+* DNS update mechanisms: AWS/Route53, web
 
 ### v0.1.1 (2021-03-13)
 * Initial release
