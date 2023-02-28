@@ -64,7 +64,7 @@ test-init:
 
 .PHONY: test-go
 test-go:
-	$(GO) test -v -covermode=atomic -coverprofile=build/coverage.out ./...
+	$(GO) test -ldflags "$(LDFLAGS)" -v -coverpkg=./... -covermode=atomic -coverprofile=build/coverage.out ./...
 
 .PHONY: clean
 clean: check clean-init clean-go clean-build

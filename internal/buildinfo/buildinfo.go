@@ -12,7 +12,7 @@ import (
 	"runtime"
 )
 
-const undefined = "<undefined>"
+const undefined = "<dev build>"
 
 var version = undefined
 var timestamp = undefined

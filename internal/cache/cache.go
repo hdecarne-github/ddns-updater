@@ -24,11 +24,11 @@ type Provider interface {
 	Flush() error
 }
 
-var cacheProvider Provider = newDefaultProvider(false)
+var cacheProvider Provider = newDefaultProvider(false, false)
 var cacheValidity time.Duration = time.Hour * 24
 
-func EnableCaching(validatiy time.Duration) {
-	cacheProvider = newDefaultProvider(true)
+func EnableCaching(validatiy time.Duration, resetCache bool) {
+	cacheProvider = newDefaultProvider(true, resetCache)
 	cacheValidity = validatiy
 }
 
@@ -68,7 +68,7 @@ type cacheEntry struct {
 	Values    []string  `toml:"values"`
 }
 
-func newDefaultProvider(persistent bool) Provider {
+func newDefaultProvider(persistent bool, resetCache bool) Provider {
 	cache := make(map[string]*cacheEntry)
 	cacheFile := ""
 	logger := logging.RootLogger().With().Str("cache", "default").Logger()
@@ -81,9 +81,16 @@ func newDefaultProvider(persistent bool) Provider {
 		}
 	}
 	if cacheFile != "" {
-		_, err := toml.DecodeFile(cacheFile, &cache)
-		if err != nil && !os.IsNotExist(err) {
-			logger.Warn().Err(err).Msgf("Failed to read cache file '%s'\n\tcause: %v", cacheFile, err)
+		if !resetCache {
+			_, err := toml.DecodeFile(cacheFile, &cache)
+			if err != nil && !os.IsNotExist(err) {
+				logger.Warn().Err(err).Msgf("Failed to read cache file '%s'\n\tcause: %v", cacheFile, err)
+			}
+		} else {
+			err := os.Truncate(cacheFile, 0)
+			if err != nil && !os.IsNotExist(err) {
+				logger.Warn().Err(err).Msgf("Failed to reset cache file '%s'\n\tcause: %v", cacheFile, err)
+			}
 		}
 	}
 	return &defaultProvider{modified: false, cache: cache, cacheFile: cacheFile, logger: logger}

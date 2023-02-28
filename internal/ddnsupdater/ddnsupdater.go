@@ -36,12 +36,13 @@ const cacheContext = "global"
 const lastUpdateCacheKey = "last_update"
 
 type ddnsupdater struct {
-	Config  string `help:"Use this config file"`
-	Pretend bool   `help:"Only show changes, but do not apply them"`
-	Force   bool   `help:"Force DNS update"`
-	Verbose bool   `help:"Enable verbose output"`
-	Debug   bool   `help:"Enable debug output"`
-	logger  zerolog.Logger
+	Config     string `help:"Use this config file"`
+	Pretend    bool   `help:"Only show changes, but do not apply them"`
+	Force      bool   `help:"Force DNS update"`
+	Verbose    bool   `help:"Enable verbose output"`
+	Debug      bool   `help:"Enable debug output"`
+	ResetCache bool   `help:"Reset cache"`
+	logger     zerolog.Logger
 }
 
 func (cmd *ddnsupdater) Run() error {
@@ -58,19 +59,7 @@ func (cmd *ddnsupdater) Run() error {
 	} else if len(updaters) == 0 {
 		cmd.logger.Warn().Msg("No DNS updaters configured")
 	} else {
-		ips, err := cmd.findIPs(finders)
-		if err != nil {
-			return err
-		}
-		if len(ips) == 0 {
-			cmd.logger.Warn().Msg("No addresses found, nothing to update")
-			return nil
-		}
-		ips = cmd.normalizeIPs(ips)
-		if !cmd.updateRequired(ips) {
-			return nil
-		}
-		err = cmd.updateIPs(updaters, ips)
+		err := cmd.rundFindAndUpdate(finders, updaters)
 		if err != nil {
 			return err
 		}
@@ -83,6 +72,22 @@ func (cmd *ddnsupdater) Run() error {
 		}
 	}
 	return nil
+}
+
+func (cmd *ddnsupdater) rundFindAndUpdate(finders []address.Finder, updaters []dns.Updater) error {
+	ips, err := cmd.findIPs(finders)
+	if err != nil {
+		return err
+	}
+	if len(ips) == 0 {
+		cmd.logger.Warn().Msg("No addresses found, nothing to update")
+		return nil
+	}
+	ips = cmd.normalizeIPs(ips)
+	if !cmd.updateRequired(ips) {
+		return nil
+	}
+	return cmd.updateIPs(updaters, ips)
 }
 
 func (cmd *ddnsupdater) findIPs(finders []address.Finder) ([]net.IP, error) {
@@ -184,6 +189,9 @@ func (cmd *ddnsupdater) applyGlobalConfig(config *ddnsupdaterConfig) {
 	} else {
 		logging.UpdateRootLogger(logging.NewSimpleConsoleLogger(os.Stderr), zerolog.WarnLevel)
 	}
+	if config.Global.CacheEnabled {
+		cache.EnableCaching(config.Global.CacheDuration, cmd.ResetCache)
+	}
 }
 
 func (cmd *ddnsupdater) evalFinderConfigs(config *ddnsupdaterConfig) []address.Finder {
@@ -199,9 +207,6 @@ func (cmd *ddnsupdater) evalFinderConfigs(config *ddnsupdaterConfig) []address.F
 	if config.WebAddressFinder.IsEnabled() {
 		finder := addressweb.NewWebFinder(&config.WebAddressFinder)
 		finders = append(finders, finder)
-	}
-	if config.Global.CacheEnabled {
-		cache.EnableCaching(config.Global.CacheDuration)
 	}
 	return finders
 }

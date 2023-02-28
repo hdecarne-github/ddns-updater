@@ -21,8 +21,16 @@ func TestReadConfig(t *testing.T) {
 	require.NotNil(t, cfg)
 }
 
-func TestRun(t *testing.T) {
-	os.Args = []string{"ddns-updater", "--config=./testdata/ddns-updater.toml", "--pretend"}
+func TestRunUpdate(t *testing.T) {
+	os.Args = []string{"ddns-updater", "--config=./testdata/ddns-updater.toml", "--pretend", "--reset-cache"}
 	err := Run()
+	require.NoError(t, err)
+
+	os.Args = []string{"ddns-updater", "--config=./testdata/ddns-updater.toml"}
+	err = Run()
+	require.NoError(t, err)
+
+	os.Args = []string{"ddns-updater", "--config=./testdata/ddns-updater.toml"}
+	err = Run()
 	require.NoError(t, err)
 }
