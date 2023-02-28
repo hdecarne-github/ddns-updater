@@ -22,6 +22,7 @@ help:
 	@echo "  make check\tcheck whether current build environment is sane"
 	@echo "  make deps\tprepare needed dependencies"
 	@echo "  make build\tbuild artifacts"
+	@echo "  make test\ttest artifacts"
 	@echo "  make clean\tdiscard build artifacts (not dependencies)"
 
 .PHONY: check
@@ -44,7 +45,7 @@ deps-go:
 	$(GO) mod download -x
 
 .PHONY: build
-build: check build-init build-go
+build: deps build-init build-go
 
 .PHONY: build-init
 build-init:
@@ -56,7 +57,7 @@ build-go:
 	$(foreach GOCMD, $(GOCMDS), $(GO) build -ldflags "$(LDFLAGS)" -o "./build/bin/$(GOCMD)$(GOCMDEXT)" ./cmd/$(GOCMD);)
 
 .PHONY: test
-test: check test-init test-go
+test: deps test-init test-go
 
 .PHONY: test-init
 test-init:
