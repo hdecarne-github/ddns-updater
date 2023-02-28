@@ -12,9 +12,9 @@ This software may be modified and distributed under the terms
 of the MIT license.  See the LICENSE file for details.
 
 ### v0.2.0 (2023-mm-dd)
-* Release of Go based re-write
-* Address finder mechanisms: interface, upnp, web
-* DNS update mechanisms: AWS/Route53, web
+* Release of completely rewritten Go based version
+* Address finder mechanisms: Interface, UPnP, Web
+* DNS update mechanisms: AWS/Route53, Web
 
 ### v0.1.1 (2021-03-13)
 * Initial release

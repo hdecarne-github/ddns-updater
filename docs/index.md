@@ -1,10 +1,12 @@
 ## About DDNS Updater
 ddns-updater is a command line tool to perform dynamic DNS (DDNS) updates. It provides various finder mechanisms to gather the
 running host's ip addresses and update mechanisms for several DNS backends.
+
 The following address detection mechanisms are supported:
 * Interface based (examining the addresses of the running host's interfaces)
 * UPnP based (querying the local network's router for the external IPv4 address)
 * Web based (querying one or more web based services to determine the running host's ip addresses)
+
 The following DNS backends are supported:
 * AWS/Route53 (updating AWS/Route53 zone information)
 * Web (invoking a web based service to update DNS)
