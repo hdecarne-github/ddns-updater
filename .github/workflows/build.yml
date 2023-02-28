@@ -30,6 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Run Build
-        run: make deps build test
+        run: make clean build test
       - name: Run SonarQube
         uses: sonarsource/sonarcloud-github-action@master

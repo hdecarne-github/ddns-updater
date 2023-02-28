@@ -1,11 +1,13 @@
-GOCMDS := ddns-updater
-GOMODULE := github.com/hdecarne-github/$(firstword $(GOCMDS))
+GOPROJECT := ddns-updater
+GOCMDS := $(GOPROJECT)
+GOMODULE := github.com/hdecarne-github/$(GOPROJECT)
 GOMODULE_VERSION :=  $(shell cat version.txt)
 
 GO := $(shell command -v go 2> /dev/null)
 
 ifdef GO
 GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
 LDFLAGS := $(LDFLAGS) -X $(GOMODULE)/internal/buildinfo.version=$(GOMODULE_VERSION) -X $(GOMODULE)/internal/buildinfo.timestamp=$(shell date +%Y%m%d%H%M%S)
 ifneq (windows, $(GOOS))
 GOCMDEXT :=
@@ -22,6 +24,7 @@ help:
 	@echo "  make check\tcheck whether current build environment is sane"
 	@echo "  make deps\tprepare needed dependencies"
 	@echo "  make build\tbuild artifacts"
+	@echo "  make dist\tcreate release package"
 	@echo "  make test\ttest artifacts"
 	@echo "  make clean\tdiscard build artifacts (not dependencies)"
 
@@ -55,6 +58,19 @@ build-init:
 build-go:
 	mkdir -p "build/bin"
 	$(foreach GOCMD, $(GOCMDS), $(GO) build -ldflags "$(LDFLAGS)" -o "./build/bin/$(GOCMD)$(GOCMDEXT)" ./cmd/$(GOCMD);)
+	cp ddns-updater.toml ./build/bin/
+
+.PHONY: dist
+dist: build dist-init dist-all
+
+.PHONY: dist-init
+dist-init:
+	@echo "Creating release package..."
+
+.PHONY: dist-all
+dist-all:
+	mkdir -p build/dist
+	tar czvf build/dist/$(GOPROJECT)-$(GOOS)-$(GOARCH)-$(GOMODULE_VERSION).tar.gz -C build/bin .
 
 .PHONY: test
 test: deps test-init test-go
