@@ -24,8 +24,8 @@ To build ddns-updater, Go version 1.20 or higher is required. The resulting bina
 Copy the either extracted or built tool binary to a location of your choice (e.g. /usr/local/bin/).
 
 ### Configuration
-The ddns-updater tool retrieves most of its configuration from a configuration file. See **ddns-updater.toml** as a reference and
-adapt it to your need. The default location of the configuration file is /etc/ddns-updater/ddns-updater.toml. An explicit location
+The ddns-updater tool retrieves most of its configuration from a configuration file. See [ddns-updater.toml](https://github.com/hdecarne-github/ddns-updater/blob/master/ddns-updater.toml) as a reference and adapt it to your need. The default location of the
+configuration file is /etc/ddns-updater/ddns-updater.toml. An explicit location
 can be given via the --config command line option (see next section).
 
 ### Usage
@@ -49,8 +49,8 @@ ddns-updater [--verbose|--debug] [--config=<config file>] [--pretend] [--force] 
 ```
 
 ### Changelog:
-See [CHANGELOG.md](https://raw.githubusercontent.com/hdecarne/ddns-updater/master/CHANGELOG.md).
+See [CHANGELOG.md](https://github.com/hdecarne-github/ddns-updater/blob/master/CHANGELOG.md).
 
 ### License
 This project is subject to the the MIT License.
-See [LICENSE](https://raw.githubusercontent.com/hdecarne/ddns-updater/master/LICENSE) information for details.
+See [LICENSE](https://github.com/hdecarne-github/ddns-updater/blob/master/LICENSE) information for details.
