@@ -1,6 +1,7 @@
 [global]
 verbose = true
 debug = true
+ansi = false
 cache_enabled = true
 cache_duration = "24h"
 

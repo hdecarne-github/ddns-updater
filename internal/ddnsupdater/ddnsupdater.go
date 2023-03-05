@@ -41,6 +41,7 @@ type ddnsupdater struct {
 	Force      bool   `help:"Force DNS update"`
 	Verbose    bool   `help:"Enable verbose output"`
 	Debug      bool   `help:"Enable debug output"`
+	Ansi       bool   `help:"Enable ANSI colored output"`
 	ResetCache bool   `help:"Reset cache"`
 	logger     zerolog.Logger
 }
@@ -182,13 +183,21 @@ func (cmd *ddnsupdater) readConfig() (*ddnsupdaterConfig, error) {
 }
 
 func (cmd *ddnsupdater) applyGlobalConfig(config *ddnsupdaterConfig) {
-	if cmd.Debug || config.Global.Debug {
-		logging.UpdateRootLogger(logging.NewSimpleConsoleLogger(os.Stdout), zerolog.DebugLevel)
-	} else if cmd.Verbose || config.Global.Verbose {
-		logging.UpdateRootLogger(logging.NewSimpleConsoleLogger(os.Stdout), zerolog.InfoLevel)
+	var logger zerolog.Logger
+	if cmd.Ansi || config.Global.Ansi {
+		logger = logging.NewDefaultConsoleLogger(os.Stdout)
 	} else {
-		logging.UpdateRootLogger(logging.NewSimpleConsoleLogger(os.Stderr), zerolog.WarnLevel)
+		logger = logging.NewSimpleConsoleLogger(os.Stdout)
 	}
+	var level zerolog.Level
+	if cmd.Debug || config.Global.Debug {
+		level = zerolog.DebugLevel
+	} else if cmd.Verbose || config.Global.Verbose {
+		level = zerolog.InfoLevel
+	} else {
+		level = zerolog.WarnLevel
+	}
+	logging.UpdateRootLogger(logger, level)
 	if config.Global.CacheEnabled {
 		cache.EnableCaching(config.Global.CacheDuration, cmd.ResetCache)
 	}
@@ -241,6 +250,7 @@ type ddnsupdaterConfig struct {
 type globalConfig struct {
 	Verbose       bool          `toml:"verbose"`
 	Debug         bool          `toml:"debug"`
+	Ansi          bool          `toml:"ansi"`
 	CacheEnabled  bool          `toml:"cache_enabled"`
 	CacheDuration time.Duration `toml:"cache_duration"`
 }
