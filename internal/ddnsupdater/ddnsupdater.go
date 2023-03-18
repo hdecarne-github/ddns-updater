@@ -41,7 +41,7 @@ type ddnsupdater struct {
 	Force      bool   `help:"Force DNS update"`
 	Verbose    bool   `help:"Enable verbose output"`
 	Debug      bool   `help:"Enable debug output"`
-	Ansi       bool   `help:"Enable ANSI colored output"`
+	Ansi       bool   `help:"Force ANSI colored output"`
 	ResetCache bool   `help:"Reset cache"`
 	logger     zerolog.Logger
 }
@@ -183,12 +183,7 @@ func (cmd *ddnsupdater) readConfig() (*ddnsupdaterConfig, error) {
 }
 
 func (cmd *ddnsupdater) applyGlobalConfig(config *ddnsupdaterConfig) {
-	var logger zerolog.Logger
-	if cmd.Ansi || config.Global.Ansi {
-		logger = logging.NewDefaultConsoleLogger(os.Stdout)
-	} else {
-		logger = logging.NewSimpleConsoleLogger(os.Stdout)
-	}
+	logger := logging.NewConsoleLogger(os.Stdout, cmd.Ansi || config.Global.Ansi)
 	var level zerolog.Level
 	if cmd.Debug || config.Global.Debug {
 		level = zerolog.DebugLevel

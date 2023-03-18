@@ -8,14 +8,14 @@
 package logging
 
 import (
-	"io"
 	"log"
 	"os"
 
+	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 )
 
-var rootLogger = NewSimpleConsoleLogger(os.Stdout)
+var rootLogger = NewConsoleLogger(os.Stdout, false)
 
 func UpdateRootLogger(logger zerolog.Logger, level zerolog.Level) {
 	zerolog.SetGlobalLevel(level)
@@ -29,12 +29,12 @@ func RootLogger() zerolog.Logger {
 	return rootLogger
 }
 
-func NewDefaultConsoleLogger(out io.Writer) zerolog.Logger {
-	return zerolog.New(zerolog.ConsoleWriter{Out: out}).With().Timestamp().Logger()
-}
-
-func NewSimpleConsoleLogger(out io.Writer) zerolog.Logger {
-	return zerolog.New(zerolog.ConsoleWriter{Out: out, NoColor: true}).With().Timestamp().Logger()
+func NewConsoleLogger(out *os.File, forceColor bool) zerolog.Logger {
+	color := forceColor
+	if !color {
+		color = isatty.IsTerminal(out.Fd())
+	}
+	return zerolog.New(zerolog.ConsoleWriter{Out: out, NoColor: !color}).With().Timestamp().Logger()
 }
 
 func init() {

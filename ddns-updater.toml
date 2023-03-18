@@ -5,7 +5,7 @@
 # Both flags can also be enabled via the command line (--verbose or --debug).
 verbose = true
 debug = false
-# Enable ANSI colored output. Can also be enabled via the command line (--ansi).
+# Force ANSI colored output. Can also be enabled via the command line (--ansi).
 ansi = false
 # The cache is used to remember states between consecutive ddns-updater runs. Especially the last DNS update.
 # Disabling the cache causes ddns-updater to update DNS on every run. The cache duration defines after which
