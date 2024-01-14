@@ -11,6 +11,9 @@ The following DNS backends are supported:
 This software may be modified and distributed under the terms
 of the MIT license.  See the LICENSE file for details.
 
+### v0.3.0 (2024-01-14)
+* Update dependencies
+
 ### v0.2.1 (2023-03-18)
 * Auto-detect TTY and use colored output if applicable
 * Update dependencies
