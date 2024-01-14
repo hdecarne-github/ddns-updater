@@ -32,8 +32,9 @@ jobs:
       - name: Run Build
         run: make dist
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-dist
           path: build/dist
           retention-days: 7
+          compression-level: 0
